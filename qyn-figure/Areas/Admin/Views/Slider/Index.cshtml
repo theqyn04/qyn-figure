@@ -1,0 +1,49 @@
+﻿@model IEnumerable<SliderModel>
+
+@{
+    ViewData["Title"] = "Danh sách slider";
+}
+
+<a asp-action="Add" asp-controller="Slider" class="btn btn-primary mb-3">Thêm slider</a>
+
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Tên</th>
+            <th scope="col">Mô tả</th>
+            <th scope="col">Ảnh</th>
+            <th scope="col">Trạng thái</th>
+            <th scope="col">Ngày tạo</th>
+            <th scope="col">Chỉnh sửa</th>
+            <th scope="col">Xóa</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var slide in Model)
+        {
+            <tr>
+                <th scope="row">@slide.Id</th>
+                <td>@slide.Name</td>
+                <td>@(slide.Description?.Length > 50 ? slide.Description.Substring(0, 50) + "..." : slide.Description)</td>
+                <td><img src="@slide.Image" alt="Slide Image" style="width: 100px; height: 100px;"></td>
+                <td>@slide.Status</td>
+                <td>@slide.CreatedAt</td>
+
+                <td><a class="btn btn-warning" asp-action="Edit" asp-controller="Slider" asp-route-Id="@slide.Id">Chỉnh sửa</a></td>
+                <td><a class="btn btn-danger confirmDeletion" asp-action="Remove" asp-controller="Slider" asp-route-Id="@slide.Id">Xóa</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.confirmDeletion').click(function() {
+                return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');
+            });
+        });
+    </script>
+}

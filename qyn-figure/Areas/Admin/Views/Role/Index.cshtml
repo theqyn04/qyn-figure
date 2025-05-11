@@ -1,0 +1,84 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<IdentityRole>
+
+@{
+    ViewData["Title"] = "Danh sách vai trò (role)";
+}
+
+<a asp-action="Add" asp-controller="Role" class="btn btn-primary mb-3">Thêm role</a>
+
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>            
+            <th scope="col">Chỉnh sửa</th>
+            <th scope="col">Xóa</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var role in Model)
+        {
+            <tr>
+                <th scope="row">@role.Id</th>
+                <td>@role.Name</td>
+
+                <td><a class="btn btn-warning" asp-action="Edit" asp-controller="Role" asp-route-RoleId="@role.Id">Chỉnh sửa</a></td>
+                <td>
+                    <form method="post" asp-action="Remove" asp-route-RoleId="@role.Id" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Pagination controls -->
+@if (ViewBag.Pager != null && ViewBag.Pager.TotalPages > 1)
+{
+    <div class="pagination-container">
+        <ul class="pagination">
+            @if (ViewBag.Pager.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pg="1">Đầu</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pg="@(ViewBag.Pager.CurrentPage - 1)">Trước</a>
+                </li>
+            }
+
+            @for (var p = ViewBag.Pager.StartPage; p <= ViewBag.Pager.EndPage; p++)
+            {
+                <li class="page-item @(p == ViewBag.Pager.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pg="@p">@p</a>
+                </li>
+            }
+
+            @if (ViewBag.Pager.CurrentPage < ViewBag.Pager.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pg="@(ViewBag.Pager.CurrentPage + 1)">Sau</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pg="@ViewBag.Pager.TotalPages">Cuối</a>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.confirmDeletion').click(function(e) {
+                e.preventDefault(); // Ngăn không cho link chuyển hướng ngay
+                if (confirm('Bạn có chắc chắn muốn xóa role này?')) {
+                    window.location.href = $(this).attr('href'); // Chuyển hướng nếu confirm OK
+                }
+            });
+        });
+    </script>
+}}

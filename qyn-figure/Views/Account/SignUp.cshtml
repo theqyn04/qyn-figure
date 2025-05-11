@@ -1,0 +1,48 @@
+﻿@model qyn_figure.Models.UserModel
+@{
+	ViewData["Title"] = "Sign Up Account";
+}
+<section id="form">
+	<!--form-->
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-4 col-sm-offset-1">
+				<div class="login-form">
+					<!--sign up form-->
+					<h2>Đăng kí tài khoản</h2>
+					<form asp-action="SignUp">
+						<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+						<div class="form-group">
+							<label>Username</label>
+							<input asp-for="Username" class="form-control" />
+							<span asp-validation-for="Username" class="text-danger"></span>
+						</div>
+
+						<div class="form-group">
+							<label>Email</label>
+							<input asp-for="Email" class="form-control" />
+							<span asp-validation-for="Email" class="text-danger"></span>
+						</div>
+
+						<div class="form-group">
+							<label>Password</label>
+							<input asp-for="Password" class="form-control" />
+							<span asp-validation-for="Password" class="text-danger"></span>
+						</div>
+
+						<div class="form-group">
+							<button class="btn btn-primary">Đăng kí</button>
+						</div>
+					</form>
+				</div><!--/login form-->
+			</div>
+			
+		</div>
+	</div>
+</section><!--/form-->
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

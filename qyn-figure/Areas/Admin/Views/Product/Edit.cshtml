@@ -1,0 +1,102 @@
+﻿@model qyn_figure.Models.ProductModel
+@{
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
+}
+
+<h3>@ViewData["Title"]</h3>
+<div class="col-md-9">
+    <form asp-action="Edit" asp-route-Id="@Model.Id" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label asp-for="Name" class="control-label">Tên sản phẩm</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CategoryId" class="control-label">Danh mục</label>
+            <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Category">
+                <option value="">-- Chọn danh mục --</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="BrandId" class="control-label">Thương hiệu</label>
+            <select asp-for="BrandId" class="form-control" asp-items="ViewBag.Brand">
+                <option value="">-- Chọn thương hiệu --</option>
+            </select>
+            <span asp-validation-for="BrandId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="SeriesId" class="control-label">Dòng sản phẩm</label>
+            <select asp-for="SeriesId" class="form-control" asp-items="ViewBag.Series">
+                <option value="">-- Chọn dòng sản phẩm --</option>
+            </select>
+            <span asp-validation-for="SeriesId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Price" class="control-label">Giá</label>
+            <input asp-for="Price" class="form-control" type="number" step="0.01" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="StockQuantity" class="control-label">Số lượng tồn kho</label>
+            <input asp-for="StockQuantity" class="form-control" type="number" min="0" />
+            <span asp-validation-for="StockQuantity" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description" class="control-label">Mô tả</label>
+            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ImageUpload" class="control-label">Hình ảnh sản phẩm</label>
+            <input asp-for="ImageUpload" class="form-control" type="file" accept="image/*" />
+            <span asp-validation-for="ImageUpload" class="text-danger"></span>
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div class="mt-2">
+                    <img src="/@Model.ImageUrl" alt="Current Image" id="currentImage" style="max-width: 200px; max-height: 200px;" />
+                </div>
+            }
+            <img id="imgPreview" class="mt-2" style="display: none; max-width: 200px; max-height: 200px;" />
+        </div>
+
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            $("#ImageUpload").change(function() {
+                readURL(this);
+                $("#currentImage").hide();
+            });
+        });
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imgPreview').attr('src', e.target.result).show();
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

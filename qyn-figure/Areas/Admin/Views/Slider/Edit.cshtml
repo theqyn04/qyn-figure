@@ -1,0 +1,48 @@
+﻿@model qyn_figure.Models.SliderModel
+@{
+	ViewData["Title"] = "Chỉnh sửa slider";
+}
+
+<h3>@ViewData["Title"]</h3>
+<div class="col-md-9">
+	<form asp-action="Edit" asp-route-Id="@Model.Id" enctype="multipart/form-data">
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+		<div class="form-group">
+			<label>Tiêu đề</label>
+			<input asp-for="Name" class="form-control" />
+			<span asp-validation-for="Name" class="text-danger"></span>
+		</div>
+
+		<div class="form-group">
+			<label>Mô tả</label>
+			<input asp-for="Description" class="form-control" />
+			<span asp-validation-for="Description" class="text-danger"></span>
+		</div>
+
+		<div class="form-group">
+			<label>Trạng thái</label>
+			<input asp-for="Status" class="form-control" />
+			<span asp-validation-for="Status" class="text-danger"></span>
+		</div>
+
+		<div class="form-group">
+			<label>Ảnh</label>
+			<input asp-for="ImageFile" class="form-control" />
+			<span asp-validation-for="ImageFile" class="text-danger"></span>
+			<img src="@Model.ImageFile" alt="Image" style="width: 100px; height: 100px;">
+		</div>
+
+		<div class="form-group">
+			<button class="btn btn-primary">Chỉnh sửa</button>
+		</div>
+	</form>
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+
+
+}

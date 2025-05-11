@@ -1,0 +1,120 @@
+﻿@model qyn_figure.Models.ContactInfo
+@{
+    ViewData["Title"] = "Chỉnh sửa thông tín";
+}
+
+<h3>@ViewData["Title"]</h3>
+<div class="col-md-9">
+    <form asp-action="Edit" asp-route-Id="@Model.Id" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label asp-for="CompanyName" class="control-label">Tên</label>
+            <input asp-for="CompanyName" class="form-control" />
+            <span asp-validation-for="CompanyName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Address" class="control-label">Địa chỉ</label>
+            <input asp-for="Address" class="form-control" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PhoneNumber" class="control-label">Số điện thoại</label>
+            <input asp-for="PhoneNumber" class="form-control" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="control-label">Email</label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="FacebookLink" class="control-label">Facebook Link</label>
+            <input asp-for="FacebookLink" class="form-control" type="number" step="0.01" />
+            <span asp-validation-for="FacebookLink" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ZaloLink" class="control-label">Zalo Link</label>
+            <input asp-for="ZaloLink" class="form-control" type="number" />
+            <span asp-validation-for="ZaloLink" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="YoutubeLink" class="control-label">Youtube Link</label>
+            <textarea asp-for="YoutubeLink" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="YoutubeLink" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="TwitterLink" class="control-label">Twitter Link</label>
+            <textarea asp-for="TwitterLink" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="TwitterLink" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="MapEmbedCode" class="control-label">Map Embed Code</label>
+            <textarea asp-for="MapEmbedCode" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="MapEmbedCode" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="WorkingHours" class="control-label">Thời gian làm việc</label>
+            <textarea asp-for="WorkingHours" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="WorkingHours" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ShortDescription" class="control-label">Mô tả ngắn</label>
+            <textarea asp-for="ShortDescription" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="ShortDescription" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ImageUpload" class="control-label">Hình ảnh sản phẩm</label>
+            <input asp-for="ImageUpload" class="form-control" type="file" accept="image/*" />
+            <span asp-validation-for="ImageUpload" class="text-danger"></span>
+            @if (!string.IsNullOrEmpty(Model.LogoPath))
+            {
+                <div class="mt-2">
+                    <img src="/@Model.LogoPath" alt="Current Image" id="currentImage" style="max-width: 200px; max-height: 200px;" />
+                </div>
+            }
+            <img id="imgPreview" class="mt-2" style="display: none; max-width: 200px; max-height: 200px;" />
+        </div>
+
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            $("#ImageUpload").change(function() {
+                readURL(this);
+                $("#currentImage").hide();
+            });
+        });
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imgPreview').attr('src', e.target.result).show();
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

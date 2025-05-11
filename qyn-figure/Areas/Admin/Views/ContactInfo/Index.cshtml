@@ -1,0 +1,141 @@
+﻿@model IEnumerable<qyn_figure.Models.ContactInfo>
+@{
+    ViewData["Title"] = "Danh sách thông tin";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>@ViewData["Title"]</h3>
+    <a asp-action="Add" asp-controller="ContactInfo" class="btn btn-success">
+        <i class="fas fa-plus"></i> Thêm thông tin
+    </a>
+</div>
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">@TempData["success"]</div>
+}
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">@TempData["error"]</div>
+}
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered" id="productTable">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Địa chỉ</th>
+                <th>Số điện thoại</th>
+                <th>Email</th>
+                <th>Link Facebook</th>
+                <th>Link Zalo</th>
+                <th>Link Youtube</th>
+                <th>Link Twitter</th>
+                <th>Mã nhúng bản đồ</th>
+                <th>Giờ làm việc</th>
+                <th>Mô tả ngắn</th>
+                <th>Hình ảnh</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var info in Model)
+            {
+                <tr>
+                    <td>@info.Id</td>
+                    <td>@info.CompanyName</td>
+                    <td>@info.Address</td>
+                    <td>@info.Email</td>
+                    <td>@info.FacebookLink</td>
+                    <td>@info.ZaloLink</td>
+                    <td>@info.YoutubeLink</td>
+                    <td>@info.TwitterLink</td>
+                    <td>@info.MapEmbedCode</td>
+                    <td>@info.WorkingHours</td>
+                    <td>@info.ShortDescription</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(info.LogoPath))
+                        {
+                            <img src="/@info.LogoPath" alt="Logo image" style="width: 80px; height: 80px; object-fit: cover;" />
+                        }
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Edit" asp-route-Id="@info.Id" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a asp-action="Remove" asp-route-Id="@info.Id"
+                               class="btn btn-sm btn-danger confirmDeletion">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (ViewBag.Pager != null && ViewBag.Pager.TotalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            @if (ViewBag.Pager.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pg="1">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pg="@(ViewBag.Pager.CurrentPage - 1)">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+            }
+
+            @for (var p = ViewBag.Pager.StartPage; p <= ViewBag.Pager.EndPage; p++)
+            {
+                <li class="page-item @(p == ViewBag.Pager.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pg="@p">@p</a>
+                </li>
+            }
+
+            @if (ViewBag.Pager.CurrentPage < ViewBag.Pager.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pg="@(ViewBag.Pager.CurrentPage + 1)">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pg="@ViewBag.Pager.TotalPages">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Xác nhận xóa
+            $('.confirmDeletion').click(function() {
+                return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');
+            });
+
+            // DataTable
+            $('#productTable').DataTable({
+                responsive: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json'
+                },
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                pageLength: 10
+            });
+        });
+    </script>
+}

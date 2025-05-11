@@ -1,0 +1,75 @@
+﻿@using qyn_figure.Models.ViewModels
+@model CartViewModel
+<section id="cart_items">
+    <div class="container">
+        <div class="breadcrumbs">
+            <ol class="breadcrumb">
+                <li><a href="#">Home</a></li>
+                <li class="active">Giỏ hàng</li>
+            </ol>
+        </div>
+
+        @if (Model.CartItems != null && Model.CartItems.Count > 0)
+        {
+            <div class="table-responsive cart_info">
+                <table class="table table-condensed">
+                    <thead>
+                        <tr class="cart_menu">
+                            <td class="image">Sản phẩm</td>
+                            <td class="description">Thông tin</td>
+                            <td class="price">Giá</td>
+                            <td class="quantity">Số lượng</td>
+                            <td class="total">Tổng</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <tr>
+                                <td class="cart_product">
+                                    <a href=""><img src="@item.ImageUrl" alt="@item.ProductName" style="width: 100px;"></a>
+                                </td>
+                                <td class="cart_description">
+                                    <h4><a href="">@item.ProductName</a></h4>
+                                    <p>Mã SP: @item.ProductId</p>
+                                </td>
+                                <td class="cart_price">
+                                    <p>@item.Price.ToString("#,##0") VNĐ</p>
+                                </td>
+                                <td class="cart_quantity">
+                                    <div class="cart_quantity_button">
+                                        <a class="cart_quantity_up" asp-action="Increase" asp-controller="Cart" asp-route-productId="@item.ProductId"> + </a>
+                                        <input class="cart_quantity_input" type="text" name="quantity" value="@item.Quantity" autocomplete="off" size="2" readonly>
+                                        <a class="cart_quantity_down" asp-action="Decrease" asp-controller="Cart" asp-route-productId="@item.ProductId"> - </a>
+                                    </div>
+                                </td>
+                                <td class="cart_total">
+                                    <p class="cart_total_price">@item.TotalPrice.ToString("#,##0") VNĐ</p>
+                                </td>
+                                <td class="cart_delete">
+                                    <a class="cart_quantity_delete" asp-action="Remove" asp-controller="Cart" asp-route-productId="@item.ProductId">
+                                        <i class="fa fa-times"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-right">
+                <h3>Tổng cộng: @Model.TotalPrice.ToString("#,##0") VNĐ</h3>
+                <a class="btn btn-warning btn-lg" asp-action="Checkout" asp-controller="Checkout">Thanh toán</a>
+                <a class="btn btn-default btn-lg" asp-controller="Home" asp-action="Index">Tiếp tục mua hàng</a>
+            </div>
+        }
+        else
+        {
+            <div class="text-center">
+                <h4>Giỏ hàng của bạn đang trống</h4>
+                <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Mua sắm ngay</a>
+            </div>
+        }
+    </div>
+</section>

@@ -1,0 +1,45 @@
+﻿@using qyn_figure.Areas.Admin.Models.ViewModels
+@model IEnumerable<UserRoleViewModel>
+
+@{
+    ViewData["Title"] = "Danh sách user";
+}
+<a asp-action="Add" asp-controller="User">Thêm user</a>
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Số điện thoại</th>
+            <th scope="col">Role ID</th>
+            <th scope="col">Tên Role</th>
+            <th scope="col">Chỉnh sửa</th>
+            <th scope="col">Xóa</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <th scope="row">@user.Id</th>
+                <td>@user.Username</td>
+                <td>@user.Email</td>
+                <td>@user.PhoneNumber</td>
+                <td>@user.RoleId</td>
+                <td>
+                    @if (user.Roles != null && user.Roles.Any())
+                    {
+                        @string.Join(", ", user.Roles)
+                    }
+                    else
+                    {
+                        <span>No role</span>
+                    }
+                </td>
+                <td><a class="btn btn-warning" asp-action="Edit" asp-controller="User" asp-route-UserId="@user.Id">Chỉnh sửa</a></td>
+                <td><a class="btn btn-danger confirmDeletion" asp-action="Remove" asp-controller="User" asp-route-UserId="@user.Id">Xóa</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
