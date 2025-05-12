@@ -10,6 +10,8 @@ public partial class QynFigureContext : IdentityDbContext<AppUserModel>
         : base(options)
     {
     }
+
+    public virtual DbSet<ShippingModel> Shippings { get; set; }
     public virtual DbSet<ContactInfo> ContactInfos { get; set; }
     public virtual DbSet<ProductImageModel> ProductImages { get; set; }
     public virtual DbSet<BrandModel> Brands { get; set; }

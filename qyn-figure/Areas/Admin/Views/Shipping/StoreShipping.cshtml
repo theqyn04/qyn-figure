@@ -1,0 +1,151 @@
+﻿@model qyn_figure.Models.ShippingModel
+@{
+    ViewData["Title"] = "Tạo Shipping";
+}
+
+<style type="text/css">
+    .css_select_div {
+        text-align: center;
+    }
+
+    .css_select {
+        display: inline-table;
+        width: 25%;
+        padding: 5px;
+        margin: 5px 2%;
+        border: solid 1px #686868;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>@ViewData["Title"]</h3>
+</div>
+
+<div class="col-md-9">
+    <form asp-action="StoreShipping">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label>Tỉnh thành</label>
+            <select class="css_select" id="tinh" name="tinh" title="Chọn Tỉnh Thành">
+                <option value="0">Tỉnh Thành</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Quận huyện</label>
+            <select class="css_select" id="quan" name="quan" title="Chọn Quận Huyện">
+                <option value="0">Quận Huyện</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Phường xã</label>
+            <select class="css_select" id="phuong" name="phuong" title="Chọn Phường Xã">
+                <option value="0">Phường Xã</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Price"></label>
+            <input asp-for="Price" class="form-control" id="price-shipping" placeholder="Nhập giá" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Thêm mới
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </form>
+    </div>
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Xác nhận xóa
+            $('.confirmDeletion').click(function() {
+                return confirm('Bạn có chắc chắn muốn xóa loại mô hình này?');
+            });
+
+            // DataTable
+            $('#categoryTable').DataTable({
+                responsive: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json'
+                },
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                pageLength: 10
+            });
+        });
+    </script>
+    <script>
+        $(".btn-add-shipping").click(function () {
+            var tinh = $("#tinh").find('option:selected').text();
+            var quan = $("#quan").find('option:selected').text();
+            var phuong = $("#phuong").find('option:selected').text();
+            var price = $("#price-shipping").find('option:selected').text();
+
+            if (tinh == '' || phuong == '' || quan == '' || price == ''){
+                Swal.fire("Làm ơn không bỏ trống.")
+            }
+            else{
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("StoreShipping", "Shipping")",
+                    data: {tinh: tinh, quan: quan, phuong:phuong, price: price },
+                
+                    success: function (result) {
+                        if (result.success){
+                            Swal.fire("Thêm vận chuyển thành công. Load lại trang để thấy data.")
+                        }
+                        else if (result.duplicate) {
+                            Swal.fire("Dữ liệu trùng lặp")
+                        }
+                    }
+                });
+            }
+        })
+
+        $(document).ready(function() {
+            //Lấy tỉnh thành
+            $.getJSON('https://esgoo.net/api-tinhthanh/1/0.htm',function(data_tinh){
+                if(data_tinh.error==0){
+                   $.each(data_tinh.data, function (key_tinh,val_tinh) {
+                      $("#tinh").append('<option value="'+val_tinh.id+'">'+val_tinh.full_name+'</option>');
+                   });
+                   $("#tinh").change(function(e){
+                        var idtinh=$(this).val();
+                        //Lấy quận huyện
+                        $.getJSON('https://esgoo.net/api-tinhthanh/2/'+idtinh+'.htm',function(data_quan){
+                            if(data_quan.error==0){
+                               $("#quan").html('<option value="0">Quận Huyện</option>');
+                               $("#phuong").html('<option value="0">Phường Xã</option>');
+                               $.each(data_quan.data, function (key_quan,val_quan) {
+                                  $("#quan").append('<option value="'+val_quan.id+'">'+val_quan.full_name+'</option>');
+                               });
+                               //Lấy phường xã
+                               $("#quan").change(function(e){
+                                    var idquan=$(this).val();
+                                    $.getJSON('https://esgoo.net/api-tinhthanh/3/'+idquan+'.htm',function(data_phuong){
+                                        if(data_phuong.error==0){
+                                           $("#phuong").html('<option value="0">Phường Xã</option>');
+                                           $.each(data_phuong.data, function (key_phuong,val_phuong) {
+                                              $("#phuong").append('<option value="'+val_phuong.id+'">'+val_phuong.full_name+'</option>');
+                                           });
+                                        }
+                                    });
+                               });
+
+                            }
+                        });
+                   });
+
+                }
+            });
+         });
+    </script>
+}

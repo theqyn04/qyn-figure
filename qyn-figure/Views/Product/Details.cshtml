@@ -113,7 +113,6 @@
 		@if (ViewBag.RelatedProducts != null && ((IEnumerable<qyn_figure.Models.ProductModel>)ViewBag.RelatedProducts).Any())
 		{
 			<div class="recommended_items">
-				<!--recommended_items-->
 				<h2 class="title text-center">Sản phẩm liên quan</h2>
 
 				<div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
@@ -135,13 +134,24 @@
 											<div class="product-image-wrapper">
 												<div class="single-products">
 													<div class="productinfo text-center">
-														<img src="~/@item.p.ImageUrl" alt="@item.p.Name" />
-														<h2>@item.p.Price.ToString("#,##0 VNĐ")</h2>
-														<p>@item.p.Name</p>
-														<a href="@Url.Action("Details", "Product", new { id = item.p.Id })" class="btn btn-default add-to-cart">
-															<i class="fa fa-shopping-cart"></i>Xem chi tiết
+														<a asp-action="Details" asp-controller="Product" asp-route-Id="@item.p.Id">
+															<div class="product-image-container">
+																<img src="~/@item.p.ImageUrl" alt="@item.p.Name" class="product-image" />
+															</div>
+															<h2>@item.p.Price.ToString("#,##0 VNĐ")</h2>
+															<p>@item.p.Name</p>
+														</a>
+														<a asp-action="AddToCart" asp-controller="Cart" asp-route-Id="@item.p.Id" class="btn btn-default add-to-cart">
+															<i class="fa fa-shopping-cart"></i>Add to cart
 														</a>
 													</div>
+												</div>
+
+												<div class="choose">
+													<ul class="nav nav-pills nav-justified">
+														<li><a href="#"><i class="fa fa-plus-square"></i>Add to wishlist</a></li>
+														<li><a href="#"><i class="fa fa-plus-square"></i>Add to compare</a></li>
+													</ul>
 												</div>
 											</div>
 										</div>
@@ -158,8 +168,6 @@
 					</a>
 				</div>
 			</div>
-
-			<!--/recommended_items-->
 		}
 	</div>
 </div>

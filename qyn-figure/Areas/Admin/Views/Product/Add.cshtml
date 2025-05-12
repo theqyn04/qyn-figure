@@ -40,7 +40,8 @@
 
         <div class="form-group">
             <label asp-for="Price" class="control-label">Giá</label>
-            <input asp-for="Price" class="form-control" type="number" step="0.01" />
+            <input asp-for="Price" class="form-control typing-price" type="number" step="0.01" />
+            <span id="price-convert"></span>
             <span asp-validation-for="Price" class="text-danger"></span>
         </div>
 
@@ -96,5 +97,13 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+        $(".typing-price").on("keyup", function (){
+            var currency_input = $(this).val();
+            $("#price-convert").html(
+                new Intl.NumberFormat('vn-VN', { style: 'currency', currency: 'VND' }).format(
+                    currency_input,
+                ));
+        });
     </script>
 }
