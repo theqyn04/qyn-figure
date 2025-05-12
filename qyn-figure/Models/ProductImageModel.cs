@@ -11,12 +11,11 @@ public class ProductImageModel
     [Required]
     public int ProductId { get; set; }
 
-    [Required]
-    public string ImageUrl { get; set; } = null!;
+    public string? ImageUrl { get; set; } = null!;
 
-    public int DisplayOrder { get; set; } = 0;
+    public int? DisplayOrder { get; set; } = 0;
 
-    public bool IsDefault { get; set; } = false;
+    public bool? IsDefault { get; set; } = false;
 
     public DateTime CreatedDate { get; set; } = DateTime.Now;
 

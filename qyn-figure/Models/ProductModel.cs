@@ -42,8 +42,9 @@ public partial class ProductModel
 
     public SeriesModel? Series { get; set; }
 
-    public ProductImageModel? ProductImage { get; set; }
-
     public virtual ICollection<OrderDetailModel> OrderDetails { get; set; } = new List<OrderDetailModel>();
+
+    public virtual ICollection<ProductImageModel> ProductImages { get; set; } = new List<ProductImageModel>();
+
 
 }
