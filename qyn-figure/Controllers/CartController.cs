@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using qyn_figure.Models;
 using qyn_figure.Models.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace qyn_figure.Controllers
 {
@@ -15,11 +16,22 @@ namespace qyn_figure.Controllers
         public IActionResult Index()
         {
             List<CartModel> cartItem = HttpContext.Session.GetJson<List<CartModel>>("cart") ?? new List<CartModel>();
-            CartViewModel cartVM = new CartViewModel()
+
+            var cartVM = new CartViewModel()
             {
                 CartItems = cartItem,
-                TotalPrice = cartItem.Sum(x => x.Quantity * x.Price)
+                TotalPrice = cartItem.Sum(x => x.Quantity * x.Price),
+                CouponCode = HttpContext.Session.GetString("AppliedCoupon")
             };
+
+            // Tính toán giảm giá nếu có coupon
+            if (!string.IsNullOrEmpty(cartVM.CouponCode))
+            {
+                var discount = HttpContext.Session.GetInt32("CouponDiscount") ?? 0;
+                cartVM.Discount = (cartVM.TotalPrice * discount) / 100; // Giả sử discount là %
+                                                                        // Hoặc cartVM.Discount = discount; // Nếu discount là số tiền cố định
+            }
+
             return View(cartVM);
         }
 
@@ -92,6 +104,51 @@ namespace qyn_figure.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        //Method GetCoupon
+        [HttpPost]
+        public async Task<IActionResult> GetCoupon(string coupon_value)
+        {
+            try
+            {
+                var validCoupon = await _context.Coupons
+                    .FirstOrDefaultAsync(x => x.Name == coupon_value && x.Status == 1);
+
+                if (validCoupon == null)
+                {
+                    return Json(new { success = false, message = "Mã giảm giá không tồn tại hoặc đã hết hiệu lực" });
+                }
+
+                if (validCoupon.DateStart > DateTime.Now)
+                {
+                    return Json(new { success = false, message = "Mã giảm giá chưa có hiệu lực" });
+                }
+
+                if (validCoupon.DateEnd < DateTime.Now)
+                {
+                    return Json(new { success = false, message = "Mã giảm giá đã hết hạn" });
+                }
+
+                if (validCoupon.Quantity <= 0)
+                {
+                    return Json(new { success = false, message = "Mã giảm giá đã hết số lượng" });
+                }
+
+                // Lưu thông tin coupon vào session
+                HttpContext.Session.SetString("AppliedCoupon", validCoupon.Name);
+                
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Áp dụng mã {validCoupon.Name} thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
         }
     }
 }

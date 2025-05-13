@@ -47,6 +47,15 @@
                                 <td class="cart_total">
                                     <p class="cart_total_price">@item.TotalPrice.ToString("#,##0") VNĐ</p>
                                 </td>
+                                <td>
+                                    <form>
+                                        Mã giảm giá: <input type="text" class="form-control coupon-value"/>
+
+                                        <span class="text text-success">@Model.CouponCode</span> <br />
+
+                                        <input type="button" vlaue="Apply" class="btn btn-sm btn-primary btn-apply-coupon"/>
+                                    </form>
+                                </td>
                                 <td class="cart_delete">
                                     <a class="cart_quantity_delete" asp-action="Remove" asp-controller="Cart" asp-route-productId="@item.ProductId">
                                         <i class="fa fa-times"></i>
@@ -73,3 +82,36 @@
         }
     </div>
 </section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            $(".btn-apply-coupon").click(function () {
+                var coupon_value = $(".coupon-value").val();
+                if (!coupon_value) {
+                    Swal.fire('Lỗi', 'Vui lòng nhập mã giảm giá', 'error');
+                    return;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetCoupon", "Cart")",
+                    data: { coupon_value: coupon_value },
+                    success: function (result) {
+                        if (result.success) {
+                            Swal.fire('Thành công', result.message, 'success').then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Lỗi', result.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Lỗi', 'Có lỗi xảy ra khi kết nối', 'error');
+                    }
+                });
+            });
+        });
+    </script>
+}

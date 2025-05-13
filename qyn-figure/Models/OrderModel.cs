@@ -12,6 +12,7 @@ public partial class OrderModel
     public string OrderCode { get; set; } = null!;
 
     public string CustomerId { get; set; }
+    public string? CouponCode { get; set; }
 
     public DateTime OrderDate { get; set; }
     [Precision(18, 2)]

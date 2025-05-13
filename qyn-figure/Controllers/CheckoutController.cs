@@ -28,11 +28,16 @@ namespace qyn_figure.Controllers
             {
                 // Create new order
                 OrderModel order = new OrderModel();
+
+                //Nhận coupon code từ cookie
+                var coupon_code = Request.Cookies["CouponTitle"];
+
                 order.CustomerId = customerId;
                 order.OrderDate = DateTime.Now;
                 order.Status = "Pending";
                 order.OrderCode = Guid.NewGuid().ToString();
                 order.TotalAmount = 0;
+                order.CouponCode = coupon_code;
 
                 // Get cart items from session
                 List<CartModel> cartItems = HttpContext.Session.GetJson<List<CartModel>>("cart") ?? new List<CartModel>();

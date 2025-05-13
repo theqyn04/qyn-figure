@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using qyn_figure.Repository;
 
@@ -11,9 +12,11 @@ using qyn_figure.Repository;
 namespace qyn_figure.Migrations
 {
     [DbContext(typeof(QynFigureContext))]
-    partial class QynFigureContextModelSnapshot : ModelSnapshot
+    [Migration("20250513152042_upadateNullCoupon")]
+    partial class upadateNullCoupon
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

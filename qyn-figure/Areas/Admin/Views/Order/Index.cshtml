@@ -12,6 +12,7 @@
             <th scope="col">Mã khách hàng</th>
             <th scope="col">Thời gian đặt hàng</th>
             <th scope="col">Tổng giá tiền</th>
+            <th scope="col">Mã giảm giá</th>
             <th scope="col">Trạng thái</th>
             <th scope="col">Chỉnh sửa</th>
             <th scope="col">Xóa</th>
@@ -26,6 +27,7 @@
                 <td>@order.CustomerId</td>
                 <td>@order.OrderDate</td>
                 <td>@order.TotalAmount.ToString("#,##0 VNĐ")</td>
+                <td>@order.CouponCode</td>
                 <td>@order.Status</td>
                 <td><a class="btn btn-warning" asp-action="Edit" asp-controller="Order" asp-route-BookTypeId="@order.OrderCode">Chỉnh sửa</a></td>
                 <td><a class="btn btn-danger confirmDeletion" asp-action="Remove" asp-controller="Order" asp-route-BookTypeId="@order.OrderCode">Xóa</a></td>
