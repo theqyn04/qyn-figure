@@ -12,8 +12,8 @@ using qyn_figure.Repository;
 namespace qyn_figure.Migrations
 {
     [DbContext(typeof(QynFigureContext))]
-    [Migration("20250513011323_test")]
-    partial class test
+    [Migration("20250513141558_updateCoupon")]
+    partial class updateCoupon
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -321,6 +321,39 @@ namespace qyn_figure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContactInfos");
+                });
+
+            modelBuilder.Entity("qyn_figure.Models.CouponModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Coupons");
                 });
 
             modelBuilder.Entity("qyn_figure.Models.OrderDetailModel", b =>

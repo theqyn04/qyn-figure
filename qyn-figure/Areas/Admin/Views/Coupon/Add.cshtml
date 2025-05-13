@@ -1,0 +1,78 @@
+﻿@model qyn_figure.Models.CouponModel
+@{
+    ViewData["Title"] = "Thêm mã giảm giá";
+}
+
+<h3>@ViewData["Title"]</h3>
+<div class="col-md-9">
+    <form asp-action="Add">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" placeholder="Nhập tiêu đề mã giảm giá" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Nhập mô tả"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DateStart"></label>
+            <input asp-for="DateStart" type="datetime-local" class="form-control" />
+            <span asp-validation-for="DateStart" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DateEnd"></label>
+            <input asp-for="DateEnd" type="datetime-local" class="form-control" />
+            <span asp-validation-for="DateEnd" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Quantity"></label>
+            <input asp-for="Quantity" type="number" min="1" class="form-control" placeholder="Nhập số lượng mã giảm giá" />
+            <span asp-validation-for="Quantity" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Status"></label>
+            <select asp-for="Status" class="form-control">
+                <option value="1">Hiển thị</option>
+                <option value="0">Ẩn</option>
+            </select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Thêm mới
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Kiểm tra ngày kết thúc phải sau ngày bắt đầu
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const startDate = new Date(document.getElementById('DateStart').value);
+            const endDate = new Date(document.getElementById('DateEnd').value);
+
+            if (endDate <= startDate) {
+                e.preventDefault();
+                alert('Ngày kết thúc phải sau ngày bắt đầu');
+            }
+        });
+    </script>
+}
