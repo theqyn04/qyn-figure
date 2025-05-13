@@ -1,5 +1,13 @@
 ﻿@model qyn_figure.Models.ContactInfo
 
+<style>
+	.contact-map {
+		width: 100%;
+		height: 400px;
+		margin-bottom: 20px;
+	}
+</style>
+
 <div id="contact-page" class="container">
 	<div class="bg">
 		<div class="row">
@@ -39,7 +47,9 @@
 					<address>
 						<p>@Model.CompanyName</p>
 						<p>Địa chỉ: @Model.Address</p>
-						<p>Map: @Model.MapEmbedCode</p>
+						<div class="contact-map">
+							@Html.Raw(Model.MapEmbedCode)
+						</div>
 						<p>Fax: @Model.PhoneNumber</p>
 						<p>Email: @Model.Email</p>
 					</address>
