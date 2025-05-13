@@ -1,0 +1,55 @@
+﻿@model qyn_figure.Models.ProductImageModel
+@{
+    ViewData["Title"] = "Chỉnh sửa ảnh sản phẩm";
+}
+
+<h3>@ViewData["Title"]</h3>
+<div class="col-md-9">
+    <form asp-action="Edit" asp-route-Id="@Model.Id" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label asp-for="ProductId" class="control-label">Mã sản phẩm</label>
+            <input asp-for="ProductId" class="form-control" />
+            <span asp-validation-for="ProductId" class="text-danger"></span>
+        </div>
+
+
+        <div class="form-group">
+            <label asp-for="ImageFile" class="control-label">Hình ảnh sản phẩm</label>
+            <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
+            <span asp-validation-for="ImageFile" class="text-danger"></span>
+            <img id="imgpreview" class="pt-2" style="display:none; max-width:200px; max-height:200px;" />
+        </div>
+
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            $("#ImageUpload").change(function() {
+                readURL(this);
+                $("#currentImage").hide();
+            });
+        });
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imgPreview').attr('src', e.target.result).show();
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}
