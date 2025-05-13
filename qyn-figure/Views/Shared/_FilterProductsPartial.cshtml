@@ -1,0 +1,51 @@
+﻿@{
+    // Lấy URL hiện tại và xử lý tham số
+    var currentPath = Context.Request.Path;
+    var queryString = Context.Request.QueryString.HasValue
+        ? Context.Request.QueryString.Value
+        : "";
+
+    // Loại bỏ sort_by nếu đã tồn tại
+    if (queryString.Contains("sort_by"))
+    {
+        var queryParams = System.Web.HttpUtility.ParseQueryString(queryString);
+        queryParams.Remove("sort_by");
+        queryString = "?" + queryParams.ToString();
+    }
+    else if (!string.IsNullOrEmpty(queryString))
+    {
+        queryString += "&";
+    }
+    else
+    {
+        queryString = "?";
+    }
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <h5>Sắp xếp theo</h5>
+            <select class="form-control" id="sort_by">
+                <option value="">---------------------</option>
+                <option value="@currentPath@(queryString)sort_by=price_increase">Giá tăng dần</option>
+                <option value="@currentPath@(queryString)sort_by=price_decrease">Giá giảm dần</option>
+                <option value="@currentPath@(queryString)sort_by=price_newest">Mới nhất</option>
+                <option value="@currentPath@(queryString)sort_by=price_oldest">Cũ nhất</option>
+            </select>
+        </div>
+        <div col-md-5">
+            <h5>Lọc theo giá</h5>
+            <form asp-action="Index" asp-controller="Category">
+                <p>
+                    <label for="amount">Khoảng giá:</label>
+                    <input type="text" id="amount" readonly="" style=#f6931f; font-weight="bolt" />
+                </p>
+
+                <div id="slider-range"></div>
+                <button type="submit" name="locgia" data-current_url="@queryString" class="btn btn-danger"></button>
+
+            </form>
+        </div>
+    </div>
+</div>

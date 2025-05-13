@@ -8,6 +8,7 @@
 	<title>Home | QynFigure</title>
 	<link href="~/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css"
 	<link href="~/css/prettyPhoto.css" rel="stylesheet">
 	<link href="~/css/price-range.css" rel="stylesheet">
 	<link href="~/css/animate.css" rel="stylesheet">
@@ -60,7 +61,7 @@
 				<div class="row">
 					<div class="col-sm-4">
 						<div class="logo pull-left">
-							<a asp-action="Index" asp-controller="Home"><img src="img/info_img/886067d2-154f-42f3-877d-7c11a9acd03f_ChatGPT Image 2025年5月11日 14_02_16.jpg"
+							<a asp-action="Index" asp-controller="Home"><img src="~/img/info_img/886067d2-154f-42f3-877d-7c11a9acd03f_ChatGPT Image 2025年5月11日 14_02_16.jpg"
 									 style="width: 120px; height: auto; object-fit: contain;" alt="Logo" />
 							</a>
 						</div>
@@ -160,7 +161,7 @@
 
 					<!--Search sản phẩm-->
 					<div class="col-sm-3">
-						<form asp-controller="Book" asp-action="Search" method="post">
+						<form asp-controller="Product" asp-action="Search" method="post">
 							<div class="search_box pull-right">
 								<input type="text" placeholder="Search" name="searchTerm" />
 								<button class="btn btn-warning" type="submit">Search</button>

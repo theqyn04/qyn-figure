@@ -6,9 +6,10 @@
 </div>
 
 <div class="col-sm-9 padding-right">
+	<partial name="_FilterProductsPartial" />
 	<div class="features_items">
 		<!--features_items-->
-		<h2 class="title text-center">Features Items</h2>
+		<h2 class="title text-center">Danh mục</h2>
 		@foreach (var item in Model)
 		{
 			<div class="col-sm-4">
@@ -42,6 +43,88 @@
 
 	</div><!--features_items-->
 
-	
+
 
 </div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <script>
+        $(function() {
+            // Lấy giá trị từ URL nếu có
+            const urlParams = new URLSearchParams(window.location.search);
+            const startPrice = urlParams.get('startprice') || 100000;
+            const endPrice = urlParams.get('endprice') || 3000000;
+
+            $("#slider-range").slider({
+                range: true,
+                min: 0,
+                max: 50000000,
+                values: [parseInt(startPrice), parseInt(endPrice)],
+                slide: function(event, ui) {
+                    $("#amount").val(ui.values[0].toLocaleString() + " VNĐ - " + ui.values[1].toLocaleString() + " VNĐ");
+                }
+            });
+
+            // Hiển thị giá trị ban đầu
+            $("#amount").val(
+                $("#slider-range").slider("values", 0).toLocaleString() + " VNĐ - " +
+                $("#slider-range").slider("values", 1).toLocaleString() + " VNĐ"
+            );
+
+            $('.btn-locgia').on('click', function() {
+                var url = $(this).data("current_url");
+                if (url) {
+                    // Lấy tất cả tham số hiện tại
+                    const urlParams = new URLSearchParams(window.location.search);
+
+                    // Xây dựng URL mới
+                    let newUrl = url + "?startprice=" + $("#slider-range").slider("values", 0) +
+                                "&endprice=" + $("#slider-range").slider("values", 1);
+
+                    // Giữ lại tham số sort_by nếu có
+                    const currentSort = urlParams.get('sort_by');
+                    if (currentSort) {
+                        newUrl += "&sort_by=" + currentSort;
+                    }
+
+                    window.location = newUrl;
+                }
+                return false;
+            });
+        });
+
+        $(document).ready(function() {
+            // Lấy tham số sort_by từ URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentSort = urlParams.get('sort_by');
+            const startPrice = urlParams.get('startprice');
+            const endPrice = urlParams.get('endprice');
+
+            // Thiết lập giá trị selected cho dropdown
+            if (currentSort) {
+                $('#sort_by').val(currentSort);
+            }
+
+            // Xử lý khi thay đổi lựa chọn
+            $('#sort_by').change(function() {
+                const selectedValue = $(this).val();
+                if (selectedValue) {
+                    // Xây dựng URL mới giữ lại tham số giá nếu có
+                    let newUrl = selectedValue;
+
+                    // Thêm tham số startprice và endprice nếu có
+                    if (startPrice || endPrice) {
+                        const separator = newUrl.includes('?') ? '&' : '?';
+                        if (startPrice) newUrl += separator + "startprice=" + startPrice;
+                        if (endPrice) newUrl += (newUrl.includes('?') ? '&' : '?') + "endprice=" + endPrice;
+                    }
+
+                    window.location.href = newUrl;
+                }
+            });
+        });
+    </script>
+}
