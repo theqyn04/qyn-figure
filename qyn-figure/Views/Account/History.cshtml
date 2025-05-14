@@ -1,0 +1,48 @@
+﻿@model IEnumerable<OrderModel>
+
+@{
+    ViewData["Title"] = "Danh sách đơn hàng";
+}
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th scope="col">Mã đơn hàng</th>
+            <th scope="col">Thời gian đặt hàng</th>
+            <th scope="col">Tổng giá tiền</th>
+            <th scope="col">Mã giảm giá</th>
+            <th scope="col">Trạng thái</th>
+            <th scope="col">Xóa</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.OrderCode</td>
+                <td>@order.OrderDate</td>
+                <td>@order.TotalAmount.ToString("#,##0 VNĐ")</td>
+                <td>@order.CouponCode</td>
+                <td>
+                    @if (order.Status == "Pending")
+                    {
+                        <span class="text text-success">Đang xử lý</span>
+                    }
+                    else if (order.Status == "Processing")
+                    {
+                        <span class="text text-primary">Đã xử lý</span>
+                    }
+                    else
+                    {
+                        <span class="text text-danger">Đã hủy</span>
+                    }
+                </td>
+                @if (order.Status != "Canceled")
+                {
+                    <td><a class="btn btn-danger confirmDeletion" asp-action="CancelOrder" asp-controller="Account" asp-route-orderId="@order.OrderId">Hủy đơn</a></td>
+                }
+                
+            </tr>
+        }
+
+    </tbody>
+</table>

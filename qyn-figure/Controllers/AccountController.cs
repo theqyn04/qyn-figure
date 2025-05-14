@@ -3,6 +3,9 @@ using qyn_figure.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using qyn_figure.Repository;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace qyn_figure.Controllers
 {
@@ -12,17 +15,20 @@ namespace qyn_figure.Controllers
         private readonly SignInManager<AppUserModel> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AccountController> _logger;
+        private readonly QynFigureContext _context;
 
         public AccountController(
             UserManager<AppUserModel> userManager,
             SignInManager<AppUserModel> signInManager,
             RoleManager<IdentityRole> roleManager,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            QynFigureContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _logger = logger;
+            _context = context;
         }
 
         [HttpGet]
@@ -193,42 +199,39 @@ namespace qyn_figure.Controllers
             }
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> ResetAdminAccount()
+        //Method xem lại lịch sử đơn hàng
+        public async Task<IActionResult> History()
         {
-            // Xóa admin cũ nếu tồn tại
-            var oldAdmin = await _userManager.FindByNameAsync("admin@example.com");
-            if (oldAdmin != null)
+            if ((bool)!User.Identity?.IsAuthenticated)
             {
-                await _userManager.DeleteAsync(oldAdmin);
+                return RedirectToAction("Login", "Account");
             }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
 
-            // Tạo user mới
-            var admin = new AppUserModel
+            var Orders = await _context.Orders.Where(od => od.CustomerId == userId).ToListAsync();
+            return View(Orders);
+        }
+
+        //Method hủy đơn hàng bởi user
+        public async Task<IActionResult> CancelOrder(int orderId)
+        {
+            if ((bool)!User.Identity?.IsAuthenticated)
             {
-                UserName = "admin@example.com",
-                Email = "admin@example.com",
-                EmailConfirmed = true
-            };
-
-            // Tạo password mới
-            var result = await _userManager.CreateAsync(admin, "Admin@123");
-
-            if (result.Succeeded)
-            {
-                // Tạo role Admin nếu chưa có
-                if (!await _roleManager.RoleExistsAsync("Admin"))
-                {
-                    await _roleManager.CreateAsync(new IdentityRole("Admin"));
-                }
-
-                // Gán role
-                await _userManager.AddToRoleAsync(admin, "Admin");
-
-                return Content("Đã tạo lại admin thành công!\nUsername: admin@example.com\nPassword: Admin@123");
+                return RedirectToAction("Login", "Account");
             }
-
-            return Content($"Lỗi khi tạo admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            try
+            {
+                var order = await _context.Orders.Where(o => o.OrderId == orderId).FirstAsync();
+                order.Status = "Canceled";
+                _context.Update(order);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("An error while canceling the order.");
+            }
+            return RedirectToAction("History", "Account");
         }
     }
 }
