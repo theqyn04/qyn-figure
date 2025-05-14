@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using qyn_figure.Repository;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using qyn_figure.Areas.Admin.Repository;
 
 namespace qyn_figure.Controllers
 {
@@ -16,19 +17,22 @@ namespace qyn_figure.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AccountController> _logger;
         private readonly QynFigureContext _context;
+        private readonly IEmailSender _emailSender;
 
         public AccountController(
             UserManager<AppUserModel> userManager,
             SignInManager<AppUserModel> signInManager,
             RoleManager<IdentityRole> roleManager,
             ILogger<AccountController> logger,
-            QynFigureContext context)
+            QynFigureContext context,
+            IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _logger = logger;
             _context = context;
+            _emailSender = emailSender;
         }
 
         [HttpGet]
@@ -233,5 +237,76 @@ namespace qyn_figure.Controllers
             }
             return RedirectToAction("History", "Account");
         }
+
+        //Gửi mail để reset password
+        public async Task<IActionResult> SendMailForgetPass(AppUserModel user)
+        {
+            var checkMail = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+
+            if (checkMail == null)
+            {
+                TempData["error"] = "Không tìm thấy email này";
+                return RedirectToAction("ForgetPass", "Account");
+            }
+            else
+            {
+                var receiver = checkMail.Email;
+                var subject = "Yêu cầu thay đổi mật khẩu cho tài khoản " + checkMail.Email;
+                var message = "Click vào đây để đổi mật khẩu " +
+                    "<a href='" + $"{Request.Scheme}://{Request.Host}/Account/NewPass?email=" + checkMail.Email + "'>";
+
+                await _emailSender.SendEmailAsync(receiver, subject, message);
+            }
+
+            TempData["success"] = "Chúng tôi đã gửi một tin nhắn đến email bạn đã đăng kí, hãy check mail để thay đổi mật khẩu.";
+            return RedirectToAction("ForgetPass", "Account");
+        }
+
+
+        public async Task<IActionResult> ForgetPass(string returnUrl)
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> NewPass(AppUserModel user)
+        {
+            var checkUser = await _userManager.Users.Where(u => u.Email == user.Email).FirstOrDefaultAsync();
+
+            if (checkUser!= null)
+            { 
+                ViewBag.Email = checkUser.Email;
+            }
+            else
+            {
+                TempData["error"] = "Email không tìm thấy";
+                return RedirectToAction("ForgetPass", "Account");
+            }
+            return View();
+        }
+
+        //Cập nhật mật khẩu mới
+        public async Task<IActionResult> UpdateNewPassword(AppUserModel user)
+        {
+            var checkUser = await _userManager.Users.Where(u => u.Email == user.Email).FirstOrDefaultAsync();
+
+            if (checkUser != null)
+            {
+               var passwordHasher = new PasswordHasher<AppUserModel>();
+               var passwordHash = passwordHasher.HashPassword(checkUser, user.PasswordHash);
+
+               checkUser.PasswordHash = passwordHash;
+               await _userManager.UpdateAsync(checkUser);
+                TempData["success"] = "Đã thay đổi password thành công.";
+                return RedirectToAction("Login", "Account");
+            }
+            else
+            {
+                TempData["error"] = "Email không tìm thấy";
+                return RedirectToAction("ForgetPass", "Account");
+            }
+            return View();
+        }
     }
+
+
 }
