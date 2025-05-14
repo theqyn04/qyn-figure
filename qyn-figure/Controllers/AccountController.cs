@@ -8,6 +8,8 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using qyn_figure.Areas.Admin.Repository;
 using System.Net;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 
 namespace qyn_figure.Controllers
 {
@@ -265,18 +267,16 @@ namespace qyn_figure.Controllers
 
             try
             {
-                // Tạo token reset password
+                // Tạo token và mã hóa đúng cách
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-                // Mã hóa token để an toàn khi truyền qua URL
-                var encodedToken = WebUtility.UrlEncode(token);
+                var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
                 // Tạo link reset
                 var resetLink = Url.Action(
-                    action: "ResetPassword",
-                    controller: "Account",
-                    values: new { email = user.Email, token = encodedToken },
-                    protocol: Request.Scheme);
+                    "ResetPassword",
+                    "Account",
+                    new { email = user.Email, token = encodedToken }, // Dùng token đã mã hóa
+                    Request.Scheme);
 
                 // Gửi email
                 var subject = "Đặt lại mật khẩu - QYN Figure";
@@ -325,17 +325,28 @@ namespace qyn_figure.Controllers
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
             {
-                TempData["Error"] = "Liên kết đặt lại mật khẩu không hợp lệ";
-                return RedirectToAction("Index", "Home");
+                TempData["Error"] = "Liên kết không hợp lệ";
+                return RedirectToAction("ForgetPass");
             }
 
-            var model = new ResetPasswordViewModel
+            try
             {
-                Email = email,
-                Token = WebUtility.UrlDecode(token) // Giải mã token
-            };
+                // Giải mã token
+                var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
 
-            return View(model);
+                var model = new ResetPasswordViewModel
+                {
+                    Email = email,
+                    Token = decodedToken
+                };
+
+                return View(model);
+            }
+            catch
+            {
+                TempData["Error"] = "Token không hợp lệ";
+                return RedirectToAction("ForgetPass");
+            }
         }
 
         [HttpPost]
@@ -352,59 +363,68 @@ namespace qyn_figure.Controllers
             {
                 // Không tiết lộ user không tồn tại
                 TempData["Success"] = "Mật khẩu đã được đặt lại thành công";
-                return RedirectToAction(nameof(Login));
+                return RedirectToAction("Login");
             }
+
+            // Log token để debug
+            _logger.LogInformation($"Using token: {model.Token}");
 
             var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+
             if (result.Succeeded)
             {
-                TempData["Success"] = "Đặt lại mật khẩu thành công. Bạn có thể đăng nhập bằng mật khẩu mới.";
-                return RedirectToAction(nameof(Login));
+                // Cập nhật SecurityStamp để vô hiệu hóa token cũ
+                await _userManager.UpdateSecurityStampAsync(user);
+
+                TempData["Success"] = "Đặt lại mật khẩu thành công! Vui lòng đăng nhập bằng mật khẩu mới.";
+                return RedirectToAction("Login");
             }
 
+            // Xử lý lỗi chi tiết
             foreach (var error in result.Errors)
             {
+                _logger.LogError($"Reset password error: {error.Code} - {error.Description}");
                 ModelState.AddModelError(string.Empty, error.Description);
             }
 
             return View(model);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateNewPassword(string email, string newPassword)
+
+        //Method to update user account infomation
+        public async Task<IActionResult> UpdateAccount()
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(newPassword))
+            if ((bool)!User.Identity?.IsAuthenticated)
             {
-                TempData["error"] = "Thông tin không hợp lệ";
-                return RedirectToAction("ForgetPass");
+                return RedirectToAction("Login", "Account");
             }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
 
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (user == null) 
+            { 
+                return NotFound();
+            }
+            return View(user);
+        }
+
+        public async Task<IActionResult> UpdateInfoAccount(AppUserModel user)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var userById = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (userById == null)
             {
-                TempData["error"] = "Email không tìm thấy";
-                return RedirectToAction("ForgetPass");
+                return NotFound();
             }
-
-            // Tạo token reset password
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-            // Thực hiện reset password
-            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
-            if (result.Succeeded)
+            else
             {
-                TempData["success"] = "Đã thay đổi mật khẩu thành công";
-                return RedirectToAction("Login");
+                _context.Update(userById);
+                await _context.SaveChangesAsync();
+                TempData["success"] = "Cập nhật thông tin thành công.";
             }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-
-            TempData["error"] = "Đổi mật khẩu thất bại";
-            return RedirectToAction("ForgetPass");
+            return RedirectToAction("UpdateAccount", "Account");
         }
     }
 

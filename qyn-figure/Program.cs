@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using qyn_figure.Areas.Admin.Repository;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace qyn_figure
 {
@@ -48,6 +49,10 @@ namespace qyn_figure
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
+                options.Lockout.AllowedForNewUsers = false; // Tắt lockout cho user mới
+                options.Lockout.MaxFailedAccessAttempts = 10; // Số lần thử tối đa (đặt lớn để vô hiệu hóa)
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1); // Thời gian lock ngắn
+
                 // Password settings.
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
@@ -70,10 +75,17 @@ namespace qyn_figure
                     _ => "Trường này là bắt buộc");
             });
 
+            builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(@"C:\temp-keys\"))
+                .SetApplicationName("qyn_figure").SetDefaultKeyLifetime(TimeSpan.FromDays(14)); // Tăng thời hạn key
+
             builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
             {
-                options.TokenLifespan = TimeSpan.FromHours(2); // Thời gian hết hạn token
+                options.TokenLifespan = TimeSpan.FromHours(2); // Giảm thời gian để test
             });
+
+
+
 
             var app = builder.Build();
 
