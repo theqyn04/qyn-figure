@@ -70,6 +70,11 @@ namespace qyn_figure
                     _ => "Trường này là bắt buộc");
             });
 
+            builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+            {
+                options.TokenLifespan = TimeSpan.FromHours(2); // Thời gian hết hạn token
+            });
+
             var app = builder.Build();
 
             app.UseStatusCodePagesWithRedirects("/Home/Error?statusCode={0}");

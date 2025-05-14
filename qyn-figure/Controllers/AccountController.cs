@@ -7,6 +7,7 @@ using qyn_figure.Repository;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using qyn_figure.Areas.Admin.Repository;
+using System.Net;
 
 namespace qyn_figure.Controllers
 {
@@ -238,73 +239,172 @@ namespace qyn_figure.Controllers
             return RedirectToAction("History", "Account");
         }
 
-        //Gửi mail để reset password
-        public async Task<IActionResult> SendMailForgetPass(AppUserModel user)
-        {
-            var checkMail = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
-
-            if (checkMail == null)
-            {
-                TempData["error"] = "Không tìm thấy email này";
-                return RedirectToAction("ForgetPass", "Account");
-            }
-            else
-            {
-                var receiver = checkMail.Email;
-                var subject = "Yêu cầu thay đổi mật khẩu cho tài khoản " + checkMail.Email;
-                var message = "Click vào đây để đổi mật khẩu " +
-                    "<a href='" + $"{Request.Scheme}://{Request.Host}/Account/NewPass?email=" + checkMail.Email + "'>";
-
-                await _emailSender.SendEmailAsync(receiver, subject, message);
-            }
-
-            TempData["success"] = "Chúng tôi đã gửi một tin nhắn đến email bạn đã đăng kí, hãy check mail để thay đổi mật khẩu.";
-            return RedirectToAction("ForgetPass", "Account");
-        }
-
-
-        public async Task<IActionResult> ForgetPass(string returnUrl)
+        [HttpGet]
+        public IActionResult ForgetPass()
         {
             return View();
         }
 
-        public async Task<IActionResult> NewPass(AppUserModel user)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgetPass(string email)
         {
-            var checkUser = await _userManager.Users.Where(u => u.Email == user.Email).FirstOrDefaultAsync();
-
-            if (checkUser!= null)
-            { 
-                ViewBag.Email = checkUser.Email;
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["Error"] = "Vui lòng nhập email";
+                return View();
             }
-            else
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                // Không tiết lộ user không tồn tại (bảo mật)
+                TempData["Success"] = "Nếu email tồn tại, liên kết đặt lại mật khẩu đã được gửi";
+                return RedirectToAction(nameof(ForgetPass));
+            }
+
+            try
+            {
+                // Tạo token reset password
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                // Mã hóa token để an toàn khi truyền qua URL
+                var encodedToken = WebUtility.UrlEncode(token);
+
+                // Tạo link reset
+                var resetLink = Url.Action(
+                    action: "ResetPassword",
+                    controller: "Account",
+                    values: new { email = user.Email, token = encodedToken },
+                    protocol: Request.Scheme);
+
+                // Gửi email
+                var subject = "Đặt lại mật khẩu - QYN Figure";
+                var message = $@"
+            <h3>Yêu cầu đặt lại mật khẩu</h3>
+            <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản {user.Email}.</p>
+            <p>Vui lòng nhấp vào liên kết sau để đặt lại mật khẩu:</p>
+            <p><a href='{resetLink}'>{resetLink}</a></p>
+            <p>Liên kết này sẽ hết hạn sau 24 giờ.</p>
+            <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>";
+
+                await _emailSender.SendEmailAsync(user.Email, subject, message);
+
+                TempData["Success"] = "Đã gửi liên kết đặt lại mật khẩu đến email của bạn. Vui lòng kiểm tra hộp thư.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi gửi email đặt lại mật khẩu");
+                TempData["Error"] = "Có lỗi xảy ra khi gửi email. Vui lòng thử lại sau.";
+            }
+
+            return RedirectToAction(nameof(ForgetPass));
+        }
+
+        public async Task<IActionResult> NewPass(string email) // Thay đổi tham số từ AppUserModel sang string
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["error"] = "Email không được để trống";
+                return RedirectToAction("ForgetPass");
+            }
+
+            var checkUser = await _userManager.FindByEmailAsync(email); // Sử dụng FindByEmailAsync thay vì query trực tiếp
+            if (checkUser == null)
             {
                 TempData["error"] = "Email không tìm thấy";
-                return RedirectToAction("ForgetPass", "Account");
+                return RedirectToAction("ForgetPass");
             }
+
+            ViewBag.Email = checkUser.Email;
             return View();
         }
 
-        //Cập nhật mật khẩu mới
-        public async Task<IActionResult> UpdateNewPassword(AppUserModel user)
+        [HttpGet]
+        public IActionResult ResetPassword(string email, string token)
         {
-            var checkUser = await _userManager.Users.Where(u => u.Email == user.Email).FirstOrDefaultAsync();
-
-            if (checkUser != null)
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
             {
-               var passwordHasher = new PasswordHasher<AppUserModel>();
-               var passwordHash = passwordHasher.HashPassword(checkUser, user.PasswordHash);
-
-               checkUser.PasswordHash = passwordHash;
-               await _userManager.UpdateAsync(checkUser);
-                TempData["success"] = "Đã thay đổi password thành công.";
-                return RedirectToAction("Login", "Account");
+                TempData["Error"] = "Liên kết đặt lại mật khẩu không hợp lệ";
+                return RedirectToAction("Index", "Home");
             }
-            else
+
+            var model = new ResetPasswordViewModel
+            {
+                Email = email,
+                Token = WebUtility.UrlDecode(token) // Giải mã token
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                // Không tiết lộ user không tồn tại
+                TempData["Success"] = "Mật khẩu đã được đặt lại thành công";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+            if (result.Succeeded)
+            {
+                TempData["Success"] = "Đặt lại mật khẩu thành công. Bạn có thể đăng nhập bằng mật khẩu mới.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateNewPassword(string email, string newPassword)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(newPassword))
+            {
+                TempData["error"] = "Thông tin không hợp lệ";
+                return RedirectToAction("ForgetPass");
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
             {
                 TempData["error"] = "Email không tìm thấy";
-                return RedirectToAction("ForgetPass", "Account");
+                return RedirectToAction("ForgetPass");
             }
-            return View();
+
+            // Tạo token reset password
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // Thực hiện reset password
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+            if (result.Succeeded)
+            {
+                TempData["success"] = "Đã thay đổi mật khẩu thành công";
+                return RedirectToAction("Login");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            TempData["error"] = "Đổi mật khẩu thất bại";
+            return RedirectToAction("ForgetPass");
         }
     }
 

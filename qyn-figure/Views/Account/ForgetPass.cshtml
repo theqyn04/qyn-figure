@@ -1,6 +1,6 @@
 ﻿@model qyn_figure.Models.AppUserModel
 @{
-    ViewData["Title"] = "Forget password";
+    ViewData["Title"] = "Quên mật khẩu";
 }
 
 <section id="form">
@@ -8,21 +8,30 @@
         <div class="row">
             <div class="col-sm-4 col-sm-offset-1">
                 <div class="login-form">
-                    <h2>Bạn quên mật khẩu</h2>
-                    <form asp-action="SendMailForgetPass" method="post">
-                        
-                       
+                    <h2>Quên mật khẩu</h2>
 
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    <form asp-action="ForgetPass" method="post">
                         <div class="form-group">
-                            <label asp-for="Email"></label>
-                            <input asp-for="Email" class="form-control" />
+                            <label asp-for="Email">Email đăng ký</label>
+                            <input asp-for="Email" class="form-control" placeholder="Nhập email của bạn" />
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
 
-                       
-
                         <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Gửi mail</button>
+                            <button type="submit" class="btn btn-primary btn-block">Gửi liên kết đặt lại</button>
+                        </div>
+
+                        <div class="text-center">
+                            <a asp-action="Login" asp-controller="Account">Quay lại đăng nhập</a>
                         </div>
                     </form>
                 </div>

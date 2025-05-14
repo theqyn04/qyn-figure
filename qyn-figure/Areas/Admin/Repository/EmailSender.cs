@@ -11,11 +11,11 @@ namespace qyn_figure.Areas.Admin.Repository
             {
                 EnableSsl = true, //bật bảo mật
                 UseDefaultCredentials = false,
-                Credentials = new NetworkCredential("quyennn3pp1@gmail.com", "diuddzmcwovgblaa")
+                Credentials = new NetworkCredential("figureqyn@gmail.com", "fhwglhejnxvzwohz")
             };
 
             return client.SendMailAsync(
-                new MailMessage(from: "quyennn3pp1@gmail.com",
+                new MailMessage(from: "figureqyn@gmail.com",
                                 to: email,
                                 subject,
                                 message
