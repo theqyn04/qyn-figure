@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using qyn_figure.Areas.Admin.Repository;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace qyn_figure
 {
@@ -85,6 +87,17 @@ namespace qyn_figure
             });
 
 
+            //Cấu hình cho Login Google Account
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie().AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+            {
+                options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
+                options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value;
+            });
 
 
             var app = builder.Build();

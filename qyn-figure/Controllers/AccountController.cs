@@ -10,6 +10,9 @@ using qyn_figure.Areas.Admin.Repository;
 using System.Net;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace qyn_figure.Controllers
 {
@@ -133,6 +136,7 @@ namespace qyn_figure.Controllers
                          $"Roles: {string.Join(", ", roles)}");
         }
 
+        //Đăng kí tài khoản
         public IActionResult SignUp()
         {
             return View();
@@ -185,10 +189,13 @@ namespace qyn_figure.Controllers
             return View(model);
         }
 
+
+        //Logout method
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            await HttpContext.SignOutAsync();
             await _signInManager.SignOutAsync();
             _logger.LogInformation("Đăng xuất thành công");
             return RedirectToAction("Index", "Home");
@@ -425,6 +432,30 @@ namespace qyn_figure.Controllers
                 TempData["success"] = "Cập nhật thông tin thành công.";
             }
             return RedirectToAction("UpdateAccount", "Account");
+        }
+
+
+        //Method login by Google
+        public async Task LoginByGoogle()
+        {
+            await HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme, new AuthenticationProperties
+            {
+                RedirectUri = Url.Action("GoogleResponse")
+            });
+        }
+
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result =  await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var claims = result.Principal.Identities.FirstOrDefault().Claims.Select(claim => new
+            {
+                claim.Issuer,
+                claim.OriginalIssuer,
+                claim.Type,
+                claim.Value
+            });
+            TempData["success"] = "Đăng nhập thành công.";
+            return RedirectToAction("Index", "Home");
         }
     }
 
