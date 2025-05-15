@@ -435,7 +435,7 @@ namespace qyn_figure.Controllers
         }
 
 
-        //Method login by Google
+        //Method login by Google OAth
         public async Task LoginByGoogle()
         {
             await HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme, new AuthenticationProperties
