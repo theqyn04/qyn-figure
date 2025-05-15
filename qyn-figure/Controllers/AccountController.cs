@@ -446,16 +446,78 @@ namespace qyn_figure.Controllers
 
         public async Task<IActionResult> GoogleResponse()
         {
-            var result =  await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            var claims = result.Principal.Identities.FirstOrDefault().Claims.Select(claim => new
+            try
             {
-                claim.Issuer,
-                claim.OriginalIssuer,
-                claim.Type,
-                claim.Value
-            });
-            TempData["success"] = "Đăng nhập thành công.";
-            return RedirectToAction("Index", "Home");
+                // Xóa cookie hiện có trước khi thử đăng nhập
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                var info = await _signInManager.GetExternalLoginInfoAsync();
+                if (info == null)
+                {
+                    // Thử cách khác để lấy thông tin
+                    var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+                    if (result?.Principal != null)
+                    {
+                        info = new ExternalLoginInfo(
+                            result.Principal,
+                            result.Properties.Items[".AuthScheme"],
+                            result.Principal.FindFirstValue(ClaimTypes.NameIdentifier),
+                            result.Principal.FindFirstValue(ClaimTypes.Name))
+                        {
+                            AuthenticationTokens = result.Properties.GetTokens()
+                        };
+                    }
+
+                    if (info == null)
+                    {
+                        TempData["error"] = "Lỗi: Không thể lấy thông tin từ Google. Vui lòng thử lại.";
+                        return RedirectToAction("Login");
+                    }
+                }
+
+                // Lấy email từ Google
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                if (string.IsNullOrEmpty(email))
+                {
+                    TempData["error"] = "Không thể lấy email từ Google.";
+                    return RedirectToAction("Login");
+                }
+
+                // Kiểm tra user đã tồn tại chưa
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    // Tạo user mới với mật khẩu mặc định
+                    user = new AppUserModel
+                    {
+                        UserName = email.Split('@')[0],
+                        Email = email,
+                        EmailConfirmed = true  // Xác thực email luôn vì dùng Google
+                    };
+
+                    // Tạo user với mật khẩu cứng "User123@"
+                    var createResult = await _userManager.CreateAsync(user, "User123@");
+
+                    if (!createResult.Succeeded)
+                    {
+                        TempData["error"] = "Không thể tạo tài khoản.";
+                        return RedirectToAction("Login");
+                    }
+
+                    // Thêm role mặc định (nếu cần)
+                    await _userManager.AddToRoleAsync(user, "Customer");
+                }
+
+                // Đăng nhập bằng Cookie (không cần Google lần sau)
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex}");
+                TempData["error"] = "Đã xảy ra lỗi hệ thống.";
+                return RedirectToAction("Login");
+            }
         }
     }
 

@@ -7,6 +7,7 @@ using qyn_figure.Areas.Admin.Repository;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.OAuth;
 
 namespace qyn_figure
 {
@@ -38,11 +39,21 @@ namespace qyn_figure
                 options.Cookie.IsEssential = true;
             });
 
+            // Cấu hình Cookie Policy
+            builder.Services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+                options.Secure = CookieSecurePolicy.Always;
+                options.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
+            });
+
+            // Cấu hình Cookie Authentication
+            // Sửa lại phần cấu hình Cookie
             builder.Services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = "/Account/Login";
-                options.AccessDeniedPath = "/Account/AccessDenied";
-                options.ReturnUrlParameter = "ReturnUrl"; // Đảm bảo tên parameter khớp
+                options.Cookie.SameSite = SameSiteMode.None; // Thay đổi từ Lax sang None
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.HttpOnly = true;
             });
 
             builder.Services.AddIdentity<AppUserModel, IdentityRole>()
@@ -67,12 +78,14 @@ namespace qyn_figure
                 options.User.RequireUniqueEmail = false;
             });
 
-            builder.Services.Configure<RouteOptions>(options => {
+            builder.Services.Configure<RouteOptions>(options =>
+            {
                 options.LowercaseUrls = true;
                 options.LowercaseQueryStrings = true;
             });
 
-            builder.Services.AddControllersWithViews(options => {
+            builder.Services.AddControllersWithViews(options =>
+            {
                 options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(
                     _ => "Trường này là bắt buộc");
             });
@@ -87,20 +100,51 @@ namespace qyn_figure
             });
 
 
-            //Cấu hình cho Login Google Account
+
             builder.Services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie().AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
-            {
-                options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
-                options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value;
-            });
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            })
+.AddCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+})
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Google:ClientSecret"];
+
+    // Thêm các cấu hình quan trọng sau
+    options.SaveTokens = true;
+    options.CorrelationCookie.SameSite = SameSiteMode.None;
+    options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+
+    options.Events = new OAuthEvents()
+    {
+        OnCreatingTicket = context =>
+        {
+            // Log thông tin ticket để debug
+            Console.WriteLine($"Access Token: {context.AccessToken}");
+            return Task.CompletedTask;
+        },
+        OnRemoteFailure = context =>
+        {
+            Console.WriteLine($"Remote failure: {context.Failure.Message}");
+            context.Response.Redirect("/Account/Login");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        }
+    };
+});
 
 
             var app = builder.Build();
+
+            app.UseCookiePolicy();
 
             app.UseStatusCodePagesWithRedirects("/Home/Error?statusCode={0}");
 
@@ -130,7 +174,12 @@ namespace qyn_figure
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
+            app.Use(async (context, next) =>
+            {
+                Console.WriteLine($"Request Path: {context.Request.Path}");
+                Console.WriteLine($"Cookies: {string.Join(", ", context.Request.Cookies.Keys)}");
+                await next();
+            });
 
             app.Run();
         }
