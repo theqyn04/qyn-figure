@@ -72,6 +72,15 @@
                 <a class="btn btn-warning btn-lg" asp-action="Checkout" asp-controller="Checkout" onclick="return confirm('Xác nhận đặt hàng?')">Thanh toán</a>
                 <a class="btn btn-default btn-lg" asp-controller="Home" asp-action="Index">Tiếp tục mua hàng</a>
             </div>
+            <div>
+                <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payment">
+                    <input type="hidden" name="Amount" value="@Model.GrandTotal"/>
+                    <input type="hidden" name="OrderInfo" value="Thanh toán cho đơn hàng tại Qyn-Figure"/>
+                    <input type="hidden" name="FullName" value="QynFigure" />
+                    <input type="hidden" name="OrderId" value="@Guid.NewGuid().ToString()" />
+                    <button class="btn btn-danger" type="submit">Thanh toán với Momo</button>
+                </form>
+            </div>
         }
         else
         {

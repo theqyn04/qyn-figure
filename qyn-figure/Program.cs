@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using qyn_figure.Models.Momo;
+using qyn_figure.Services;
 
 namespace qyn_figure
 {
@@ -16,6 +18,10 @@ namespace qyn_figure
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            //Kết nối Momo
+            builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
+            builder.Services.AddScoped<IMomoService, MomoService>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -38,6 +44,8 @@ namespace qyn_figure
                 // Make the session cookie essential
                 options.Cookie.IsEssential = true;
             });
+
+            
 
             // Cấu hình Cookie Policy
             builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -106,7 +114,7 @@ namespace qyn_figure
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
             })
-.AddCookie(options =>
+              .AddCookie(options =>
 {
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -173,13 +181,6 @@ namespace qyn_figure
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-
-            app.Use(async (context, next) =>
-            {
-                Console.WriteLine($"Request Path: {context.Request.Path}");
-                Console.WriteLine($"Cookies: {string.Join(", ", context.Request.Cookies.Keys)}");
-                await next();
-            });
 
             app.Run();
         }
