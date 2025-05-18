@@ -1,51 +1,44 @@
 ﻿@{
-    // Lấy URL hiện tại và xử lý tham số
     var currentPath = Context.Request.Path;
-    var queryString = Context.Request.QueryString.HasValue
-        ? Context.Request.QueryString.Value
-        : "";
+    var queryString = Context.Request.QueryString.HasValue ? Context.Request.QueryString.Value : "";
+    var queryParams = System.Web.HttpUtility.ParseQueryString(queryString);
 
-    // Loại bỏ sort_by nếu đã tồn tại
-    if (queryString.Contains("sort_by"))
-    {
-        var queryParams = System.Web.HttpUtility.ParseQueryString(queryString);
-        queryParams.Remove("sort_by");
-        queryString = "?" + queryParams.ToString();
-    }
-    else if (!string.IsNullOrEmpty(queryString))
-    {
-        queryString += "&";
-    }
-    else
-    {
-        queryString = "?";
-    }
+    // Lưu lại sort_by nếu có
+    var currentSort = queryParams["sort_by"];
+    var currentStartPrice = queryParams["startprice"];
+    var currentEndPrice = queryParams["endprice"];
+
+    // Xóa các tham số lọc để xây dựng lại query base
+    queryParams.Remove("sort_by");
+    queryParams.Remove("startprice");
+    queryParams.Remove("endprice");
+    var baseUrl = $"{currentPath}?{queryParams}";
 }
 
 <div class="container">
     <div class="row">
-        <div class="col-md-2">
+        <!-- Sort -->
+        <div class="col-md-3">
             <h5>Sắp xếp theo</h5>
             <select class="form-control" id="sort_by">
                 <option value="">---------------------</option>
-                <option value="@currentPath@(queryString)sort_by=price_increase">Giá tăng dần</option>
-                <option value="@currentPath@(queryString)sort_by=price_decrease">Giá giảm dần</option>
-                <option value="@currentPath@(queryString)sort_by=price_newest">Mới nhất</option>
-                <option value="@currentPath@(queryString)sort_by=price_oldest">Cũ nhất</option>
+                <option value="@baseUrl&sort_by=price_increase">Giá tăng dần</option>
+                <option value="@baseUrl&sort_by=price_decrease">Giá giảm dần</option>
+                <option value="@baseUrl&sort_by=price_newest">Mới nhất</option>
+                <option value="@baseUrl&sort_by=price_oldest">Cũ nhất</option>
             </select>
         </div>
-        <div col-md-5">
+
+        <!-- Price filter dropdown -->
+        <div class="col-md-3">
             <h5>Lọc theo giá</h5>
-            <form asp-action="Index" asp-controller="Category">
-                <p>
-                    <label for="amount">Khoảng giá:</label>
-                    <input type="text" id="amount" readonly="" style=#f6931f; font-weight="bolt" />
-                </p>
-
-                <div id="slider-range"></div>
-                <button type="submit" name="locgia" data-current_url="@queryString" class="btn btn-danger"></button>
-
-            </form>
+            <select class="form-control" id="price_filter">
+                <option value="">---------------------</option>
+                <option value="@baseUrl&startprice=0&endprice=1000000">Dưới 1.000.000 VNĐ</option>
+                <option value="@baseUrl&startprice=1000000&endprice=5000000">1.000.000 - 5.000.000 VNĐ</option>
+                <option value="@baseUrl&startprice=5000000&endprice=10000000">5.000.000 - 10.000.000 VNĐ</option>
+                <option value="@baseUrl&startprice=10000000&endprice=999999999">Trên 10.000.000 VNĐ</option>
+            </select>
         </div>
     </div>
 </div>

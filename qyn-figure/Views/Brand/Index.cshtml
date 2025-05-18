@@ -1,14 +1,16 @@
 ﻿@using qyn_figure.Models
 @model IEnumerable<ProductModel>
 
+
 <div class="col-sm-3">
 	@Html.Partial("_SideBar")
 </div>
 
 <div class="col-sm-9 padding-right">
+    <partial name="_FilterProductsPartial" />
 	<div class="features_items">
 		<!--features_items-->
-		<h2 class="title text-center">Features Items</h2>
+        <h2 class="title text-center">@ViewBag.BrandName</h2>
 		@foreach (var item in Model)
 		{
 			<div class="col-sm-4">
@@ -29,12 +31,7 @@
 
 					</div>
 
-					<div class="choose">
-						<ul class="nav nav-pills nav-justified">
-							<li><a href="#"><i class="fa fa-plus-square"></i>Add to wishlist</a></li>
-							<li><a href="#"><i class="fa fa-plus-square"></i>Add to compare</a></li>
-						</ul>
-					</div>
+					
 				</div>
 			</div>
 		}
@@ -45,3 +42,51 @@
 	
 
 </div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <script>
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentSort = urlParams.get('sort_by');
+            const startPrice = urlParams.get('startprice');
+            const endPrice = urlParams.get('endprice');
+
+            // Gán giá trị hiện tại cho dropdown sort_by
+            if (currentSort) {
+                $('#sort_by option').each(function () {
+                    if (this.value.includes(`sort_by=${currentSort}`)) {
+                        $(this).prop('selected', true);
+                    }
+                });
+            }
+
+            // Gán giá trị hiện tại cho dropdown price filter
+            if (startPrice && endPrice) {
+                const filterValue = `startprice=${startPrice}&endprice=${endPrice}`;
+                $('#price_filter option').each(function () {
+                    if (this.value.includes(filterValue)) {
+                        $(this).prop('selected', true);
+                    }
+                });
+            }
+
+            // Khi chọn sort
+            $('#sort_by').change(function () {
+                const selectedUrl = $(this).val();
+                if (selectedUrl) {
+                    window.location.href = selectedUrl;
+                }
+            });
+
+            // Khi chọn lọc giá
+            $('#price_filter').change(function () {
+                const selectedUrl = $(this).val();
+                if (selectedUrl) {
+                    window.location.href = selectedUrl;
+                }
+            });
+        });
+    </script>
+}

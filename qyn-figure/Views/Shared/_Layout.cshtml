@@ -144,7 +144,7 @@
 						</div>
 						<div class="mainmenu pull-left">
 							<ul class="nav navbar-nav collapse navbar-collapse">
-								<li><a asp-controller="Home" class="active">Home</a></li>
+								<li><a asp-controller="Home" asp-action="Index" class="active">Home</a></li>
 								<li class="dropdown">
 									<a asp-controller="Product">Shop<i class="fa fa-angle-down"></i></a>
 									<ul role="menu" class="sub-menu">
@@ -163,7 +163,7 @@
 									</ul>
 								</li>
 								<li><a href="404.html">404</a></li>
-								<li><a href="contact-us.html">Contact</a></li>
+								<li><a asp-action="Index" asp-controller="ContactInfo">Contact</a></li>
 							</ul>
 						</div>
 					</div>

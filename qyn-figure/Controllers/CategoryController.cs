@@ -22,11 +22,13 @@ namespace qyn_figure.Controllers
             {
                 var allProducts = await _context.Products.ToListAsync();
                 return View(allProducts);
-            }
+            }            
 
             // Tìm danh mục
             var category = await _context.Categories
                 .FirstOrDefaultAsync(c => c.Name == Name);
+
+            ViewBag.CategoryName = category.Name;
 
             if (category == null)
             {

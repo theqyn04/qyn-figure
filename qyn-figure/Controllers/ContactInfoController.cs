@@ -15,5 +15,6 @@ namespace qyn_figure.Controllers
             var info = _context.ContactInfos.FirstOrDefault();
             return View(info);
         }
+
     }
 }

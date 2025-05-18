@@ -1,246 +1,289 @@
 ﻿@model qyn_figure.Models.ViewModels.ProductDetailsViewModel
 <div class="row">
-	<div class="col-sm-3">
-		@Html.Partial("_SideBar")
-	</div>
+    <div class="col-sm-3">
+        @Html.Partial("_SideBar")
+    </div>
 
-	<div class="col-sm-9 padding-right">
-		<div class="product-details">
-			<!--product-details-->
-			<div class="col-sm-5">
-				<!-- Carousel chỉ hiển thị một ảnh lớn -->
-				<div id="mainImageCarousel" class="carousel slide" data-ride="carousel">
-					<div class="carousel-inner text-center">
-						@for (int i = 0; i < Model.ProductImages.Count; i++)
-						{
-							<div class="carousel-item @(i == 0 ? "active" : "")">
-								<img src="~/@Model.ProductImages[i].ImageUrl" class="d-block w-100 main-carousel-img" alt="Ảnh sản phẩm">
-							</div>
-						}
-					</div>
+    <div class="col-sm-9 padding-right">
+        <div class="product-details">
+            <!--product-details-->
+            <div class="col-sm-5">
+                <!-- Carousel chỉ hiển thị một ảnh lớn -->
+                <div id="mainImageCarousel" class="carousel slide" data-ride="carousel">
+                    <div class="carousel-inner text-center">
+                        @for (int i = 0; i < Model.ProductImages.Count; i++)
+                        {
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@Url.Content("~/" + Model.ProductImages[i].ImageUrl)" class="d-block w-100 main-carousel-img" alt="Ảnh sản phẩm">
 
-					<a class="carousel-control-prev" href="#mainImageCarousel" role="button" data-slide="prev">
-						<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-						<span class="sr-only">Previous</span>
-					</a>
-					<a class="carousel-control-next" href="#mainImageCarousel" role="button" data-slide="next">
-						<span class="carousel-control-next-icon" aria-hidden="true"></span>
-						<span class="sr-only">Next</span>
-					</a>
-				</div>
+                            </div>
+                        }
+                    </div>
 
-				<!-- Thumbnail nằm ngang bên dưới -->
-				<div class="d-flex flex-row justify-content-center mt-3">
-					@for (int i = 0; i < Model.ProductImages.Count; i++)
-					{
-						<img src="~/@Model.ProductImages[i].ImageUrl"
-							 class="thumbnail-img mx-1 @(i == 0 ? "active-thumb" : "")"
-							 data-target="#mainImageCarousel"
-							 data-slide-to="@i"
-							 style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;" />
-					}
-				</div>
-			</div>
+                    <a class="carousel-control-prev" href="#mainImageCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#mainImageCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
 
+                <!-- Thumbnail nằm ngang bên dưới -->
+                <div class="d-flex flex-row justify-content-center mt-3">
+                    @for (int i = 0; i < Model.ProductImages.Count; i++)
+                    {
+                        <img src="@Url.Content("~/" + Model.ProductImages[i].ImageUrl)"
+                             class="thumbnail-img mx-1 @(i == 0 ? "active-thumb" : "")"
+                             data-target="#mainImageCarousel"
+                             data-slide-to="@i"
+                             style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;" />
+                    }
+                </div>
+            </div>
 
-			<div class="col-sm-7">
-				<div class="product-information">
-					<!--/product-information-->
+            <div class="col-sm-7">
+                <div class="product-information">
+                    <!--/product-information-->
+                    <h2>@Model.Product.Name</h2>
+                    <p>Mã sản phẩm: @Model.Product.Id</p>
 
-					<h2>@Model.Product.Name</h2>
-					<p>Mã sản phẩm: @Model.Product.Id</p>
+                    <span>
+                        <span>@Model.Product.Price.ToString("#,##0 VNĐ")</span>
+                        <label>Số lượng: @Model.Product.StockQuantity</label>
+                        <input type="number" value="1" min="1" max="@Model.Product.StockQuantity" id="quantity" />
+                        <button type="button" class="btn btn-fefault cart" onclick="addToCart(@Model.Product.Id)">
+                            <i class="fa fa-shopping-cart"></i>
+                            Thêm vào giỏ
+                        </button>
+                    </span>
 
+                    <p><b>Tình trạng:</b> @(Model.Product.StockQuantity > 0 ? "Còn hàng" : "Hết hàng")</p>
+                    <p><b>Danh mục:</b> @Model.Product.Category?.Name</p>
+                    <p><b>Thương hiệu:</b> @Model.Product.Brand?.Name</p>
 
-					<span>
-						<span>@Model.Product.Price.ToString("#,##0 VNĐ")</span>
-						<label>Số lượng: @Model.Product.StockQuantity</label>
-						<input type="number" value="1" min="1" max="@Model.Product.StockQuantity" id="quantity" />
-						<button type="button" class="btn btn-fefault cart" onclick="addToCart(@Model.Product.Id)">
-							<i class="fa fa-shopping-cart"></i>
-							Thêm vào giỏ
-						</button>
-					</span>
+                    <div class="share">
+                        <p><b>Chia sẻ:</b></p>
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                        <a href="#"><i class="fa fa-google-plus"></i></a>
+                        <a href="#"><i class="fa fa-pinterest"></i></a>
+                    </div>
+                </div><!--/product-information-->
+            </div>
+        </div><!--/product-details-->
+        <!-- Category tab -->
+        <div class="category-tab shop-details-tab">
+            <!--category-tab-->
+            
 
-					<p><b>Tình trạng:</b> @(Model.Product.StockQuantity > 0 ? "Còn hàng" : "Hết hàng")</p>
-					<p><b>Danh mục:</b> @Model.Product.Category?.Name</p>
-					<p><b>Thương hiệu:</b> @Model.Product.Brand?.Name</p>
+            <div class="tab-content">
+                <div class="tab-pane fade active in" id="details">
+                    <div class="col-sm-12 product-description-area">
+                        <h3 class="description-title">@Model.Product.Name</h3>
+                        
+                        <div class="description-content">
+                            @if (!string.IsNullOrEmpty(Model.Product.Description))
+                            {
+                                @Html.Raw(Model.Product.Description)
+                            }
+                            else
+                            {
+                                <p>Chưa có mô tả sản phẩm</p>
+                            }
+                        </div>
+                    </div>
+                </div>
 
-					<div class="share">
-						<p><b>Chia sẻ:</b></p>
-						<a href="#"><i class="fa fa-facebook"></i></a>
-						<a href="#"><i class="fa fa-twitter"></i></a>
-						<a href="#"><i class="fa fa-google-plus"></i></a>
-						<a href="#"><i class="fa fa-pinterest"></i></a>
-					</div>
-				</div><!--/product-information-->
-			</div>
-		</div><!--/product-details-->
+            </div>
+        </div><!--/category-tab-->
+        <!-- Recommended items -->
+        @if (ViewBag.RelatedProducts != null && ((IEnumerable<qyn_figure.Models.ProductModel>)ViewBag.RelatedProducts).Any())
+        {
+            <div class="recommended_items">
+                <h2 class="title text-center">Sản phẩm liên quan</h2>
 
-		<div class="category-tab shop-details-tab">
-			<!--category-tab-->
-			
-			
-			
-			<div class="tab-content">
-				<div class="tab-pane fade" id="details">
-					<div class="col-sm-12">
-						<p>@Model.Product.Description</p>
-					</div>
-				</div>
+                <div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
+                    <div class="carousel-inner">
+                        @{
+                            var relatedProducts = (IEnumerable<qyn_figure.Models.ProductModel>)ViewBag.RelatedProducts;
+                            var relatedGroups = relatedProducts
+                            .Select((p, i) => new { p, i })
+                            .GroupBy(x => x.i / 3);
+                        }
 
-				<div class="tab-pane fade" id="specs">
-					<div class="col-sm-12">
-						<table class="table table-bordered">
-							<tbody>
-								<tr>
-									<td><strong>Danh mục</strong></td>
-									<td>@Model.Product.Category?.Name</td>
-								</tr>
-								<tr>
-									<td><strong>Thương hiệu</strong></td>
-									<td>@Model.Product.Brand?.Name</td>
-								</tr>
-								<tr>
-									<td><strong>Series</strong></td>
-									<td>@Model.Product.Series?.Name</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div><!--/category-tab-->
-		@if (ViewBag.RelatedProducts != null && ((IEnumerable<qyn_figure.Models.ProductModel>)ViewBag.RelatedProducts).Any())
-		{
-			<div class="recommended_items">
-				<h2 class="title text-center">Sản phẩm liên quan</h2>
+                        @foreach (var group in relatedGroups)
+                        {
+                            <div class="item @(group.Key == 0 ? "active" : "")">
+                                @foreach (var item in group)
+                                {
+                                    <div class="col-sm-4">
+                                        <div class="product-image-wrapper">
+                                            <div class="single-products">
+                                                <div class="productinfo text-center">
+                                                    <a asp-action="Details" asp-controller="Product" asp-route-Id="@item.p.Id">
+                                                        <div class="product-image-container">
+                                                            <img src="@Url.Content("~/" + item.p.ImageUrl)" alt="@item.p.Name" class="product-image" />
 
-				<div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
-					<div class="carousel-inner">
-						@{
-							var relatedProducts = (IEnumerable<qyn_figure.Models.ProductModel>)ViewBag.RelatedProducts;
-							var relatedGroups = relatedProducts
-							.Select((p, i) => new { p, i })
-							.GroupBy(x => x.i / 3);
-						}
+                                                        </div>
+                                                        <h2>@item.p.Price.ToString("#,##0 VNĐ")</h2>
+                                                        <p>@item.p.Name</p>
+                                                    </a>
+                                                    <a asp-action="AddToCart" asp-controller="Cart" asp-route-Id="@item.p.Id" class="btn btn-default add-to-cart">
+                                                        <i class="fa fa-shopping-cart"></i>Add to cart
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <a class="left recommended-item-control" href="#recommended-item-carousel" data-slide="prev">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a class="right recommended-item-control" href="#recommended-item-carousel" data-slide="next">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                </div>
+            </div>
 
-						@foreach (var group in relatedGroups)
-						{
-							<div class="item @(group.Key == 0 ? "active" : "")">
-								<div class="row">
-									@foreach (var item in group)
-									{
-										<div class="col-sm-4">
-											<div class="product-image-wrapper">
-												<div class="single-products">
-													<div class="productinfo text-center">
-														<a asp-action="Details" asp-controller="Product" asp-route-Id="@item.p.Id">
-															<div class="product-image-container">
-																<img src="~/@item.p.ImageUrl" alt="@item.p.Name" class="product-image" />
-															</div>
-															<h2>@item.p.Price.ToString("#,##0 VNĐ")</h2>
-															<p>@item.p.Name</p>
-														</a>
-														<a asp-action="AddToCart" asp-controller="Cart" asp-route-Id="@item.p.Id" class="btn btn-default add-to-cart">
-															<i class="fa fa-shopping-cart"></i>Add to cart
-														</a>
-													</div>
-												</div>
-
-												<div class="choose">
-													<ul class="nav nav-pills nav-justified">
-														<li><a href="#"><i class="fa fa-plus-square"></i>Add to wishlist</a></li>
-														<li><a href="#"><i class="fa fa-plus-square"></i>Add to compare</a></li>
-													</ul>
-												</div>
-											</div>
-										</div>
-									}
-								</div>
-							</div>
-						}
-					</div>
-					<a class="left recommended-item-control" href="#recommended-item-carousel" data-slide="prev">
-						<i class="fa fa-angle-left"></i>
-					</a>
-					<a class="right recommended-item-control" href="#recommended-item-carousel" data-slide="next">
-						<i class="fa fa-angle-right"></i>
-					</a>
-				</div>
-			</div>
-		}
-	</div>
+            <!--/recommended_items-->
+        }
+    </div>
 </div>
 
 @section Scripts {
-	<script>
-		function changeMainImage(imgUrl) {
-			$('#main-product-image').attr('src', '/' + imgUrl);
-		}
+    <script>
+        function changeMainImage(imgUrl) {
+            $('#main-product-image').attr('src', '/' + imgUrl);
+        }
 
-		function addToCart(productId) {
-			var quantity = $('#quantity').val();
-			$.post('@Url.Action("AddToCart", "Cart")', {
-				productId: productId,
-				quantity: quantity
-			}, function(data) {
-				if (data.success) {
-					alert('Đã thêm sản phẩm vào giỏ hàng');
-					updateCartCount();
-				} else {
-					alert(data.message);
-				}
-			});
-		}
+        function addToCart(productId) {
+            var quantity = $('#quantity').val();
+            $.post('@Url.Action("AddToCart", "Cart")', {
+                productId: productId,
+                quantity: quantity
+            }, function(data) {
+                if (data.success) {
+                    alert('Đã thêm sản phẩm vào giỏ hàng');
+                    updateCartCount();
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
 
-		function updateCartCount() {
-			$.get('@Url.Action("GetCartCount", "Cart")', function(count) {
-				$('#cart-count').text(count);
-			});
-		}
+        function updateCartCount() {
+            $.get('@Url.Action("GetCartCount", "Cart")', function(count) {
+                $('#cart-count').text(count);
+            });
+        }
 
-		$(document).ready(function () {
-			$('.thumbnail-img').click(function () {
-				const index = $(this).data('slide-to');
-				$('#mainImageCarousel').carousel(index);
-				$('.thumbnail-img').removeClass('active-thumb');
-				$(this).addClass('active-thumb');
-			});
-		});
-
-
-
-	</script>
+        $(document).ready(function () {
+            $('.thumbnail-img').click(function () {
+                const index = $(this).data('slide-to');
+                $('#mainImageCarousel').carousel(index);
+                $('.thumbnail-img').removeClass('active-thumb');
+                $(this).addClass('active-thumb');
+            });
+        });
+    </script>
 }
 
 <style>
-	.main-carousel-img {
-		max-height: 400px;
-		object-fit: contain;
-		margin: 0 auto;
-		padding: 10px;
-		background-color: #fff;
-		border: 1px solid #eee;
-	}
+    .main-carousel-img {
+        max-height: 400px;
+        object-fit: contain;
+        margin: 0 auto;
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #eee;
+    }
 
-	.thumbnail-img {
-		border: 2px solid transparent;
-		transition: border 0.3s;
-	}
+    .thumbnail-img {
+        border: 2px solid transparent;
+        transition: border 0.3s;
+    }
 
-		.thumbnail-img.active-thumb {
-			border: 2px solid #f33;
-		}
+        .thumbnail-img.active-thumb {
+            border: 2px solid #f33;
+        }
 
-	.carousel-inner .carousel-item {
-		display: none;
-		transition: transform 0.6s ease-in-out;
-	}
+    .carousel-inner .carousel-item {
+        display: none;
+        transition: transform 0.6s ease-in-out;
+    }
 
-		.carousel-inner .carousel-item.active {
-			display: block;
-		}
+        .carousel-inner .carousel-item.active {
+            display: block;
+        }
 
+    /* Style cho phần sản phẩm liên quan */
+    .recommended_items {
+        overflow: hidden;
+        margin-top: 40px;
+    }
 
+    .recommended-item-control {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #FE980F;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 50%;
+    }
+
+        .recommended-item-control.left {
+            left: -15px;
+        }
+
+        .recommended-item-control.right {
+            right: -15px;
+        }
+
+        .recommended-item-control:hover {
+            background: #e68a0e;
+        }
+
+    /* Đảm bảo các sản phẩm liên quan hiển thị đều nhau */
+    #recommended-item-carousel .col-sm-4 {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .product-description-area {
+        padding: 20px;
+        background-color: #fafafa;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .description-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #fe980f;
+        padding-bottom: 5px;
+    }
+
+    .description-subtitle {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #555;
+    }
+
+    .description-content {
+        font-size: 15px;
+        line-height: 1.8;
+        color: #444;
+    }
 
 </style>

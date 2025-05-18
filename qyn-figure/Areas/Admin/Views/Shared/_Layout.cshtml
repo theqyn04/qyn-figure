@@ -35,6 +35,22 @@
 	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/ico/apple-touch-icon-72-precomposed.png">
 	<link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
 </head><!--/head-->
+<style>
+	.navbar-nav .nav-link {
+		padding: 0.5rem 1rem;
+		margin-right: 0.5rem;
+		border-radius: 0.25rem;
+		transition: background-color 0.2s ease;
+	}
+
+		.navbar-nav .nav-link:hover {
+			background-color: #f8f9fa;
+		}
+
+	.navbar-nav .nav-item {
+		margin-bottom: 0.25rem;
+	}
+</style>
 
 <body>
 	<header id="header">
@@ -81,60 +97,37 @@
 			</div>
 		</div><!--/header-middle-->
 
-		<div class="header-bottom">
-			<!--header-bottom-->
+		<div class="header-bottom sticky-top bg-light shadow-sm py-2">
 			<div class="container">
-				<div class="row">
-					<div class="col-sm-9">
-						<div class="navbar-header">
-							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-								<span class="sr-only">Toggle navigation</span>
-								<span class="icon-bar"></span>
-								<span class="icon-bar"></span>
-								<span class="icon-bar"></span>
-							</button>
-						</div>
-						<div class="mainmenu pull-left">
-							<ul class="nav navbar-nav collapse navbar-collapse">
-								<li><a href="~/Home" class="active">Home</a></li>
-								<li class="dropdown">
-									<a asp-controller="Product">Shop<i class="fa fa-angle-down"></i></a>
-									<ul role="menu" class="sub-menu">
-										<li><a asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
-										<li><a asp-controller="Product" asp-action="Index">Sản phẩm</a></li>
-										<li><a asp-controller="ProductImage" asp-action="Index">Ảnh sản phẩm</a></li>
-										<li><a asp-controller="Coupon" asp-action="Index">Mã giảm giá</a></li>
-										<li><a asp-controller="Category" asp-action="Index">Loại sản phẩm</a></li>
-										<li><a asp-controller="Brand" asp-action="Index">Thương hiệu</a></li>
-										<li><a asp-controller="Series" asp-action="Index">Series</a></li>
-										<li><a asp-controller="Shipping" asp-action="Index">Ship</a></li>
-										<li><a asp-controller="Order" asp-action="Index">Đơn hàng</a></li>
-										<li><a asp-controller="User" asp-action="Index">User</a></li>
-										<li><a asp-controller="Role">Vai trò</a></li>
-										<li><a asp-controller="Slider">Slider</a></li>
-										<li><a asp-controller="ContactInfo">Thông tin liên hệ</a></li>
-									</ul>
-								</li>
-								<li class="dropdown">
-									<a href="#">Blog<i class="fa fa-angle-down"></i></a>
-									<ul role="menu" class="sub-menu">
-										<li><a href="blog.html">Blog List</a></li>
-										<li><a href="blog-single.html">Blog Single</a></li>
-									</ul>
-								</li>
-								<li><a href="404.html">404</a></li>
-								<li><a href="contact-us.html">Contact</a></li>
-							</ul>
-						</div>
+				<nav class="navbar navbar-expand-lg navbar-light">
+					<a class="navbar-brand font-weight-bold mr-4" href="#">Admin</a>
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#adminNavbar"
+							aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+
+					<div class="collapse navbar-collapse" id="adminNavbar">
+						<ul class="navbar-nav mr-auto">
+							<li class="nav-item"><a class="nav-link" asp-controller="Dashboard" asp-action="Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="Product" asp-action="Index"><i class="fas fa-box"></i> Sản phẩm</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="ProductImage" asp-action="Index"><i class="fas fa-image"></i> Ảnh sản phẩm</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="Coupon" asp-action="Index"><i class="fas fa-tag"></i> Mã giảm giá</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="Category" asp-action="Index"><i class="fas fa-list"></i> Loại sản phẩm</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="Brand" asp-action="Index"><i class="fas fa-copyright"></i> Thương hiệu</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="Series" asp-action="Index"><i class="fas fa-stream"></i> Series</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="Shipping" asp-action="Index"><i class="fas fa-shipping-fast"></i> Ship</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="Order" asp-action="Index"><i class="fas fa-receipt"></i> Đơn hàng</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="User" asp-action="Index"><i class="fas fa-users"></i> User</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="Role"><i class="fas fa-user-tag"></i> Vai trò</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="Slider"><i class="fas fa-sliders-h"></i> Slider</a></li>
+							<li class="nav-item"><a class="nav-link" asp-controller="ContactInfo"><i class="fas fa-info-circle"></i> Thông tin liên hệ</a></li>
+						</ul>
 					</div>
-					<div class="col-sm-3">
-						<div class="search_box pull-right">
-							<input type="text" placeholder="Search" />
-						</div>
-					</div>
-				</div>
+				</nav>
 			</div>
-		</div><!--/header-bottom-->
+		</div>
+
+
 	</header><!--/header-->
 	@Html.Partial("_NotificationPartial")
 

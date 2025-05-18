@@ -26,8 +26,10 @@ namespace qyn_figure.Controllers
             }
 
             // Tìm thương hiệu theo tên
-            BrandModel brand = await _context.Brands
+            var brand = await _context.Brands
                 .FirstOrDefaultAsync(c => c.Name == Name);
+
+            ViewBag.BrandName = brand.Name;
 
             if (brand == null)
             {
