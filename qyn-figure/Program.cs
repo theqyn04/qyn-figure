@@ -23,6 +23,9 @@ namespace qyn_figure
             builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
             builder.Services.AddScoped<IMomoService, MomoService>();
 
+            // Đăng ký OtpService
+            builder.Services.AddSingleton<IOtpService, OtpService>();
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 

@@ -1,77 +1,190 @@
 ﻿@model qyn_figure.Models.ContactInfo
 
 <style>
-	.contact-map {
-		width: 100%;
-		height: 400px;
-		margin-bottom: 20px;
-	}
+    .contact-info address p {
+        margin: 8px 0;
+        font-size: 16px;
+        line-height: 1.4;
+    }
+
+    .social-networks ul {
+        padding: 0;
+        list-style: none;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 15px;
+    }
+
+        .social-networks ul li a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #3b5998;
+            border-radius: 50%;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+            .social-networks ul li a.twitter {
+                background-color: #1DA1F2;
+            }
+
+            .social-networks ul li a.youtube {
+                background-color: #FF0000;
+            }
+
+            .social-networks ul li a:hover {
+                filter: brightness(85%);
+            }
+
+    .contact-description {
+        font-size: 16px;
+        margin-bottom: 20px;
+        color: #444;
+        text-align: center;
+        transition: color 1.5s ease-in-out;
+    }
+
+    .fun-facts {
+        margin-top: 40px;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 18px;
+        color: #555;
+        user-select: none;
+    }
+
+    .animated-text {
+        font-weight: bold;
+        color: #e67e22;
+        font-size: 22px;
+        margin: 20px 0;
+    }
+
+    .scrolling-text {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        padding: 10px 0;
+        background: #f0f0f0;
+    }
+
+        .scrolling-text p {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll-left 15s linear infinite;
+            font-size: 16px;
+            color: #2980b9;
+            margin: 0;
+        }
 </style>
 
 <div id="contact-page" class="container">
-	<div class="bg">
-		<div class="row">
-			<div class="col-sm-12">
-				<h2 class="title text-center">Contact <strong>Us</strong></h2>
-				<div id="gmap" class="contact-map">
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-8">
-				<div class="contact-form">
-					<h2 class="title text-center">Get In Touch</h2>
-					<div class="status alert alert-success" style="display: none"></div>
-					<form id="main-contact-form" class="contact-form row" name="contact-form" method="post">
-						<div class="form-group col-md-6">
-							<input type="text" name="name" class="form-control" required="required" placeholder="Name">
-						</div>
-						<div class="form-group col-md-6">
-							<input type="email" name="email" class="form-control" required="required" placeholder="Email">
-						</div>
-						<div class="form-group col-md-12">
-							<input type="text" name="subject" class="form-control" required="required" placeholder="Subject">
-						</div>
-						<div class="form-group col-md-12">
-							<textarea name="message" id="message" required="required" class="form-control" rows="8" placeholder="Your Message Here"></textarea>
-						</div>
-						<div class="form-group col-md-12">
-							<input type="submit" name="submit" class="btn btn-primary pull-right" value="Submit">
-						</div>
-					</form>
-				</div>
-			</div>
-			<div class="col-sm-4">
-				<div class="contact-info">
-					<h2 class="title text-center">Contact Info</h2>
-					<address>
-						<p>@Model.CompanyName</p>
-						<p>Địa chỉ: @Model.Address</p>
-						<div class="contact-map">
-							@Html.Raw(Model.MapEmbedCode)
-						</div>
-						<p>Fax: @Model.PhoneNumber</p>
-						<p>Email: @Model.Email</p>
-					</address>
-					<div class="social-networks">
-						<h2 class="title text-center">Social Networking</h2>
-						<ul>
-							<li>
-								<a href="@Model.FacebookLink"><i class="fa fa-facebook"></i></a>
-							</li>
-							<li>
-								<a href="@Model.TwitterLink"><i class="fa fa-twitter"></i></a>
-							</li>
-							<li>
-								<a href="#"><i class="fa fa-google-plus"></i></a>
-							</li>
-							<li>
-								<a href="@Model.YoutubeLink"><i class="fa fa-youtube"></i></a>
-							</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div><!--/#contact-page-->
+    <div class="bg">
+        <div class="row">
+            <div class="col-sm-12">
+                <h2 class="title text-center">Liên hệ <strong>Qyn Figure</strong></h2>
+                <p class="contact-description" id="contact-desc">
+                    Qyn Figure - Nơi hội tụ những mô hình figure chất lượng, cập nhật sản phẩm anime, manga, game HOT nhất!
+                </p>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <!-- Thông tin liên hệ -->
+            <div class="col-md-12">
+                <div class="contact-info text-center">
+                    <h3 class="title">Thông tin liên hệ</h3>
+                    <address>
+                        <p><strong>@Model.CompanyName</strong></p>
+                        <p><i class="fa fa-map-marker"></i> @Model.Address</p>
+                        <p><i class="fa fa-phone"></i> @Model.PhoneNumber</p>
+                        <p><i class="fa fa-envelope"></i> @Model.Email</p>
+                    </address>
+
+                    <div class="social-networks">
+                        <h4>Kết nối với chúng tôi</h4>
+                        <ul>
+                            @if (!string.IsNullOrEmpty(Model.FacebookLink))
+                            {
+                                <li>
+                                    <a href="@Model.FacebookLink" target="_blank" title="Facebook" aria-label="Facebook">
+                                        <svg width="20" height="20" fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.333v21.334C0 23.403.597 24 1.325 24H12.82v-9.294H9.692v-3.622h3.127V8.41c0-3.1 1.894-4.788 4.659-4.788 1.325 0 2.466.099 2.797.143v3.24l-1.92.001c-1.505 0-1.796.716-1.796 1.766v2.316h3.59l-.467 3.622h-3.123V24h6.116c.73 0 1.324-.597 1.324-1.333V1.333C24 .597 23.403 0 22.675 0z" />
+                                        </svg>
+                                    </a>
+                                </li>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.TwitterLink))
+                            {
+                                <li>
+                                    <a href="@Model.TwitterLink" target="_blank" class="twitter" title="Twitter" aria-label="Twitter">
+                                        <svg width="20" height="20" fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M23.954 4.569c-.885.39-1.83.654-2.825.775 1.014-.608 1.794-1.574 2.163-2.724-.949.563-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-2.72 0-4.924 2.204-4.924 4.917 0 .39.045.765.127 1.124-4.09-.205-7.72-2.165-10.148-5.144-.424.725-.666 1.562-.666 2.475 0 1.708.87 3.213 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.062c0 2.385 1.693 4.374 3.946 4.828-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.318-3.808 2.105-6.102 2.105-.396 0-.779-.023-1.17-.067 2.179 1.396 4.768 2.209 7.557 2.209 9.054 0 14-7.496 14-13.986 0-.209 0-.42-.015-.63.961-.695 1.8-1.562 2.46-2.549z" />
+                                        </svg>
+                                    </a>
+                                </li>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.YoutubeLink))
+                            {
+                                <li>
+                                    <a href="@Model.YoutubeLink" target="_blank" class="youtube" title="YouTube" aria-label="YouTube">
+                                        <svg width="20" height="20" fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M23.498 6.186a2.998 2.998 0 00-2.11-2.12C19.345 3.5 12 3.5 12 3.5s-7.344 0-9.389.566a2.998 2.998 0 00-2.11 2.12 31.056 31.056 0 000 5.628 2.998 2.998 0 002.11 2.12C4.656 14.5 12 14.5 12 14.5s7.345 0 9.389-.566a2.998 2.998 0 002.11-2.12 31.056 31.056 0 000-5.628zM9.546 14.5v-5l4.91 2.5-4.91 2.5z" />
+                                        </svg>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Hiệu ứng đổi màu nhẹ nhàng cho đoạn mô tả liên hệ
+        const contactDesc = document.getElementById('contact-desc');
+        let hue = 0;
+        setInterval(() => {
+            if (contactDesc) {
+                hue = (hue + 1) % 360;
+                contactDesc.style.color = `hsl(${hue}, 70%, 40%)`;
+            }
+        }, 100);
+
+        // Hiệu ứng nhấp nháy tiêu đề
+        const animatedText = document.querySelector('.animated-text');
+        let colorToggle = true;
+        setInterval(() => {
+            if (animatedText) {
+                animatedText.style.color = colorToggle ? '#e67e22' : '#d35400';
+                colorToggle = !colorToggle;
+            }
+        }, 1000);
+
+        // Hiệu ứng nhấp nháy text mỗi 500ms
+        setInterval(() => {
+            const el = document.querySelector('.animated-text');
+            if (!el) return;
+            el.style.visibility = (el.style.visibility === 'hidden') ? 'visible' : 'hidden';
+        }, 1000);
+
+
+      
+    </script>
+
+}

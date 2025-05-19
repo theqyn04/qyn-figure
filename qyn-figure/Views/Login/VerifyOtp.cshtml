@@ -1,0 +1,46 @@
+﻿@model qyn_figure.Models.ViewModels.VerifyOtpViewModel
+@{
+    ViewData["Title"] = "Xác thực OTP";
+}
+
+<section id="form">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4 col-sm-offset-1">
+                <div class="login-form">
+                    <h2>Xác thực OTP</h2>
+                    <p>Mã OTP đã được gửi đến email @Model.Email</p>
+
+                    @if (TempData["error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["error"]</div>
+                    }
+
+                    <form asp-action="VerifyOtp" method="post">
+                        <input type="hidden" asp-for="Email" />
+
+                        <div class="form-group">
+                            <label asp-for="Otp">Mã OTP</label>
+                            <input asp-for="Otp" class="form-control" placeholder="Nhập mã OTP 6 chữ số" />
+                            <span asp-validation-for="Otp" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-block">Xác thực</button>
+                        </div>
+
+                        <div class="text-center">
+                            <a asp-action="ForgotPassword">Gửi lại mã OTP</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
