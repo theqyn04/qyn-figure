@@ -1,4 +1,4 @@
-# What is the Qyn Figure Project?
+![image](https://github.com/user-attachments/assets/67a040a6-1d70-4d3d-b883-948a530c4143)# What is the Qyn Figure Project?
 
 This Project is a application project written in ASP.NET MVC
 
@@ -37,6 +37,24 @@ If you liked the project or if Equinox helped you, please give a star ;)
 * Event Sourcing
 * Unit of Work
 * Repository
+
+## Demo
+
+![Ảnh local](https://github.com/theqyn04/qyn-figure/blob/master/qyn-figure/wwwroot/img/demo_img/demo1.png)
+
+![Ảnh local](https://github.com/theqyn04/qyn-figure/blob/master/qyn-figure/wwwroot/img/demo_img/demo2.png)
+
+![Ảnh local](https://github.com/theqyn04/qyn-figure/blob/master/qyn-figure/wwwroot/img/demo_img/demo3.png)
+
+![Ảnh local](https://github.com/theqyn04/qyn-figure/blob/master/qyn-figure/wwwroot/img/demo_img/demo4.png)
+
+![Ảnh local](https://github.com/theqyn04/qyn-figure/blob/master/qyn-figure/wwwroot/img/demo_img/demo5.png)
+
+![Ảnh local](https://github.com/theqyn04/qyn-figure/blob/master/qyn-figure/wwwroot/img/demo_img/demo6.png)
+
+![Ảnh local](https://github.com/theqyn04/qyn-figure/blob/master/qyn-figure/wwwroot/img/demo_img/demo7.png)
+
+![Ảnh local](https://github.com/theqyn04/qyn-figure/blob/master/qyn-figure/wwwroot/img/demo_img/demo8.png)
 
 ### Connect me via: quyennguyen99000@gmail.com
 
