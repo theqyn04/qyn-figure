@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/67a040a6-1d70-4d3d-b883-948a530c4143)# What is the Qyn Figure Project?
+# What is the Qyn Figure Project?
 
 This Project is a application project written in ASP.NET MVC
 
